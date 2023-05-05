@@ -1,47 +1,54 @@
+import streamlit as st
+import tempfile
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-import os
 from langchain.chat_models import ChatOpenAI
-from langchain.chains.question_answering import load_qa_chain 
-from langchain.vectorstores import FAISS
-from langchain.embeddings.openai import OpenAIEmbeddings 
-from apikey import openai_api_key 
+from langchain.chains.question_answering import load_qa_chain
+from langchain.vectorstores import FAISS, Pinecone
+import pinecone
+from langchain.embeddings.openai import OpenAIEmbeddings
+from apikey import openai_api_key, pinecone_api_key, pinecone_api_env
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.llms import OpenAI
 import pandas as pd
 import json
 
-loader = PyPDFLoader("../brk_annual_report.pdf")
+st.set_page_config(page_title="Finance Bot", page_icon=":moneybag:")
+st.title("Finance Bot")
+uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
-data = loader.load_and_split()
+if uploaded_file is not None:
+    with st.spinner("Loading PDF..."):
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            tmp.write(uploaded_file.getvalue())
+            tmp_path = tmp.name
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=10)
-texts = text_splitter.split_documents(data)
+        loader = PyPDFLoader(tmp_path)
 
-embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
+    data = loader.load_and_split()
 
-db = FAISS.from_documents(texts, embeddings)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=10)
+    texts = text_splitter.split_documents(data)
 
-llm = ChatOpenAI(temperature=0, model_name="gpt-4",openai_api_key=openai_api_key)
+    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
 
-reponse_schemas = [
-    ResponseSchema(name="industry", description="The industry"),
-    ResponseSchema(name="time", description="The amount of time"),
-]
+    pinecone.init(
+        api_key=pinecone_api_key,
+        environment=pinecone_api_env,
+    )
+    index_name = "nuggt"
 
-output_parser = StructuredOutputParser.from_response_schemas(reponse_schemas)
+    docsearch = Pinecone.from_texts([t.page_content for t in texts], embeddings, index_name=index_name)
 
-format_instructions = output_parser.get_format_instructions()
-print(format_instructions)
+    query = st.text_input("Enter your query:")
 
-template = """
+    if query:
+        with st.spinner("Fetching answer..."):
+            llm = ChatOpenAI(temperature=0, model_name="gpt-4", openai_api_key=openai_api_key)
+            docs = docsearch.similarity_search(query)
+            chain = load_qa_chain(llm, chain_type="stuff")
 
-"""
-# chain = load_qa_chain(llm, chain_type="stuff")
-# query = "Give me a summary of Berkshire Hathaway's financial statement in 2022"
-# docs = db.similarity_search(query)
-
-# answer = chain.run(input_documents=docs, question=query)
-
-# print(answer)
+            answer = chain.run(input_documents=docs, question=query)
+        
+        st.write(answer)
