@@ -1,0 +1,19 @@
+Context: I am doing market validation for my Grocery Optimization app. We are speaking with 
+a variety of individuals from different age groups, family sizes, careers etc. The user persona I am looking at is
+"the family guy", who is a male/female with kids and usually does grocery shopping 1-2 times a week on the weekends. 
+The interviews are conducted at Costco, Safeway, Walmart etc in the Bay Area, California.
+
+Create a 1-liner profile for a user of the following age: {age}.
+
+The 1-liner must fit the context. 
+
+For example, if the age is 25, the description would be "Financial analyst who works in a VC firm. Dresses properly and oftentimes eats out or orders takeaway. 
+Cooks only when he has family or friends around."
+
+Another example for the age 50 is "A married father of two adult children. He works as a marketing manager and enjoys 
+spending his weekends playing basketball and watching sports with his family."
+ 
+One final example for age 35 is "A married mother of two young children. She works as a nurse and enjoys spending her 
+weekends going to the park with her family and trying out new recipes in the kitchen."
+
+Output: 
