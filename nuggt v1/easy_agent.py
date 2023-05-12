@@ -5,6 +5,8 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 from langchain.utilities import PythonREPL, GoogleSerperAPIWrapper
+from gradio_tools.tools import (StableDiffusionTool, ImageCaptioningTool, StableDiffusionPromptGeneratorTool, TextToVideoTool)
+from langchain.tools import SceneXplainTool
 from io import StringIO
 import traceback
 import openai
@@ -16,6 +18,7 @@ import os
 openai.api_key = "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"
 os.environ["OPENAI_API_KEY"] = "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"
 os.environ["SERPER_API_KEY"] = "9cae0f9d724d3cb2e51211d8e49dfbdc22ab279b"
+os.environ["SCENEX_API_KEY"] = "f7GcmHvrJY050vmMn85L:1b7202dcbd71af619f044f87fc6721c5233c24e3cd64e2ee9c9ff69e29647024"
 search_api = GoogleSerperAPIWrapper()
 
 """class PythonREPLa:
@@ -93,10 +96,13 @@ def video_tool(query):
 
 def python(code):
     global python_repl
+    print(f"The code before changes:\n{code}")
     code = code.strip("```")
     code = code.strip("python\n")
-    print(code)
-    return python_repl.run(code)   
+    result = python_repl.run(code) 
+    print(f"The code after changes:\n{code}")
+    print(f"Output of the code:\n{result}")
+    return result   
 
 def search(query):
     global search_api
@@ -116,6 +122,17 @@ def custom_llm(query):
 
     return response.choices[0].message["content"].strip()
 
+def stablediffusion(query):
+    prompt = StableDiffusionPromptGeneratorTool().langchain.run(query)
+    #return StableDiffusionTool().langchain.run(query)
+    return StableDiffusionTool().run(prompt)
+
+def image_caption(path):
+    return SceneXplainTool().run(path)
+
+def generate_video(query):
+    return TextToVideoTool().langchain.run(query)
+
 def get_tools(variable_dictionary):
     tools = []
     tools_description = "\n\nYou can use the following tools:\n\n" 
@@ -131,7 +148,10 @@ def add_to_variable_dictionary(tool_name):
         "python": {"type": "tool", "name": "python", "use": "A Python shell. Use this to execute python code. Input should be a valid python code. If you want to see the output of a value, you should print it out with `print(...)`. Assume all packages are already installed.", "input": "Input should be a valid python code. Ensure proper indentation", "function": python},
         "search": {"type": "tool", "name": "search", "use": "Use this tool to get information from the internet", "input": "Input should be the query you want to search", "function": search},
         "video_tool": {"type": "tool", "name": "video_tool", "use": "useful when you want to retrieve information from a video", "input": "The input should be a JSON of the following format:\n{\"video_url\": \"URL of the video\", \"information\": \"the information you want to retrieve from the video\"}", "function": video_tool},
-        "llm": {"type": "tool", "name": "llm", "use": "useful to get answer from an llm model", "input": "The input should be in the following format:\n{\"prompt\": \"The prompt to initialise the LLM\", \"input\": \"The input to the LLM\"}", "function": custom_llm}
+        "llm": {"type": "tool", "name": "llm", "use": "useful to get answer from an llm model", "input": "The input should be in the following format:\n{\"prompt\": \"The prompt to initialise the LLM\", \"input\": \"The input to the LLM\"}", "function": custom_llm},
+        "stablediffusion": {"type": "tool", "name": "stablediffusion", "use": "Use this to generate an image from a prompt. This tool will return the path to the generated image.", "input": "the prompt to generate the image", "function": stablediffusion},
+        "generate_video": {"type": "tool", "name": "generate_video", "use": "Use this to generate a video from a prompt. This tool will return the path to the generated video.", "input": "the prompt to generate the video", "function": generate_video},
+        "image_caption": {"type": "tool", "name": "image_caption", "use": "Use this to caption an image.", "input": "the path to the image", "function": image_caption},
         }
     return tools[tool_name]
 
@@ -201,8 +221,6 @@ def initialise_agent(nuggt, variable_dictionary):
         messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
         #print(messages[0]["content"])
 
-    
-
 user_input = input("Enter your instruction: ")
 variables = extract_variables(user_input)
 variable_dictionary = get_variable_dictionary(variables)
@@ -219,6 +237,5 @@ Thought: I now know the final answer
 Final Answer: {output}
 """
 nuggt = nuggt + tools_description + output_format
-print(nuggt)
+#print(nuggt)
 print(initialise_agent(nuggt, variable_dictionary))
-
