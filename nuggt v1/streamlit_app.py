@@ -137,7 +137,8 @@ def add_to_variable_dictionary(tool_name):
 def get_variable_dictionary(variables):
     variable_dictionary = {}
     for index, variable in enumerate(variables):
-        type = st.text_input(f"Choose type for {variable}: ", key={str(index) + "_type"})
+        # type = st.text_input(f"Choose type for {variable}: ", key={str(index) + "_type"})
+        type = st.radio(f"Choose type for {variable}: ", ('tool', 'video', 'user input'), key={str(index) + "_type"})
         if type == "user input":
             variable_dictionary[variable] = {"type": type}
         elif type == "video":
@@ -145,7 +146,8 @@ def get_variable_dictionary(variables):
             variable_dictionary[variable] = {"type": type, "content": video_url}
             variable_dictionary["video_tool"] = add_to_variable_dictionary("video_tool")
         elif type == "tool":
-            tool_name = st.text_input("Choose a tool: ", key={str(index) + "_tool"})
+            # tool_name = st.text_input("Choose a tool: ", key={str(index) + "_tool"})
+            tool_name = st.radio(f"Choose a tool: ", ('python', 'search', 'video_tool', 'llm', 'stablediffusion', 'generate_video', 'image_caption'), key={str(index) + "_tool"})
             variable_dictionary[variable] = {"type": "tool_name", "content": tool_name}
             variable_dictionary[tool_name] = add_to_variable_dictionary(tool_name)
     return variable_dictionary
@@ -200,6 +202,16 @@ def initialise_agent(nuggt, variable_dictionary):
         messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
         #print(messages[0]["content"])
 
+def get_output(output, output_type):
+    output_map = {
+        "acknowledgement": st.write("Acknowledged"),
+        "image file": st.download_button("Download image", output),
+        "video file": st.download_button("Download video", output),
+        "txt file": st.download_button("Download text file", output),
+        "code file": st.download_button("Download code file", output),
+    }
+    return output_map[output_type]
+
     
 def main():
     st.title('Nuggt.io')
@@ -216,7 +228,9 @@ def main():
         variable_dictionary = get_variable_dictionary(variables)
         nuggt = get_nuggt(user_input, variable_dictionary)
         tools, tools_description = get_tools(variable_dictionary)
-        output = st.text_input("Enter output format: ", key="output")
+        # output = st.text_input("Enter output format: ", key="output")
+        output = st.radio(f"Enter output format: ", ('acknowledgement', 'video file', 'code file', "image file", "txt file"), key="output")
+
         output_format = f"""\nUse the following format:
         Thought: you should always think about what to do
         Action: the action to take, should be one of {tools}.
@@ -228,8 +242,9 @@ def main():
         """
         nuggt = nuggt + tools_description + output_format
         # st.text(nuggt)
-        st.text(initialise_agent(nuggt, variable_dictionary))
-    
+        # st.text(initialise_agent(nuggt, variable_dictionary))
+        get_output(initialise_agent(nuggt, variable_dictionary), output)
+
 if __name__ == "__main__":
     main()
 
