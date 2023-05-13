@@ -1,0 +1,9 @@
+Meeting Minutes
+
+Date: 01/01/2022
+Attendees: John, Jane, Doe
+Agenda: Project Update
+
+- John said: The project is on track.
+- Jane said: We need to finalize the design.
+- Doe said: I will complete the documentation by next week.

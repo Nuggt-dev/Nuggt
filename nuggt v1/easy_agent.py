@@ -12,9 +12,10 @@ import sys
 import json
 import re
 import os
+import streamlit as st
 
-openai.api_key = "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"
-os.environ["OPENAI_API_KEY"] = "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"
+openai.api_key = "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"
+os.environ["OPENAI_API_KEY"] = "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"
 os.environ["SERPER_API_KEY"] = "9cae0f9d724d3cb2e51211d8e49dfbdc22ab279b"
 search_api = GoogleSerperAPIWrapper()
 
@@ -137,16 +138,16 @@ def add_to_variable_dictionary(tool_name):
 
 def get_variable_dictionary(variables):
     variable_dictionary = {}
-    for variable in variables:
-        type = input(f"Choose type for {variable}: ")
+    for index, variable in enumerate(variables):
+        type = st.text_input(f"Choose type for {variable}: ", key={str(index) + "_type"})
         if type == "user input":
             variable_dictionary[variable] = {"type": type}
         elif type == "video":
-            video_url = input("Enter the video URL: ")
+            video_url = st.text_input("Enter the video URL: ", key={str(index) + "_video"})
             variable_dictionary[variable] = {"type": type, "content": video_url}
             variable_dictionary["video_tool"] = add_to_variable_dictionary("video_tool")
         elif type == "tool":
-            tool_name = input("Choose a tool: ")
+            tool_name = st.text_input("Choose a tool: ", key={str(index) + "_tool"})
             variable_dictionary[variable] = {"type": "tool_name", "content": tool_name}
             variable_dictionary[tool_name] = add_to_variable_dictionary(tool_name)
     return variable_dictionary
@@ -154,7 +155,7 @@ def get_variable_dictionary(variables):
 def get_nuggt(user_input, variable_dictionary):
     for variable in variable_dictionary.keys():
         if variable_dictionary[variable]["type"] == "user input":
-            temp = input("Enter your input: ")
+            temp = st.text_input("Enter your input: ", key={variable + "temp"})
             replace_string = "{" + variable + "}"
             user_input = user_input.replace(replace_string, "<" + temp + ">")
         elif variable_dictionary[variable]["type"] == "video":
@@ -202,23 +203,31 @@ def initialise_agent(nuggt, variable_dictionary):
         #print(messages[0]["content"])
 
     
+def main():
+    st.title('Nuggt.io')
 
-user_input = input("Enter your instruction: ")
-variables = extract_variables(user_input)
-variable_dictionary = get_variable_dictionary(variables)
-nuggt = get_nuggt(user_input, variable_dictionary)
-tools, tools_description = get_tools(variable_dictionary)
-output = input("Enter output format: ")
-output_format = f"""\nUse the following format:
-Thought: you should always think about what to do
-Action: the action to take, should be one of {tools}.
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: {output}
-"""
-nuggt = nuggt + tools_description + output_format
-print(nuggt)
-print(initialise_agent(nuggt, variable_dictionary))
+    # UI for entering user_input
+    user_input = st.text_input("Enter your instruction: ", key="enter_instruction")
+    if user_input:
+        # Process user_input
+        variables = extract_variables(user_input)
+        variable_dictionary = get_variable_dictionary(variables)
+        nuggt = get_nuggt(user_input, variable_dictionary)
+        tools, tools_description = get_tools(variable_dictionary)
+        output = st.text_input("Enter output format: ", key="output")
+        output_format = f"""\nUse the following format:
+        Thought: you should always think about what to do
+        Action: the action to take, should be one of {tools}.
+        Action Input: the input to the action
+        Observation: the result of the action
+        ... (this Thought/Action/Action Input/Observation can repeat N times)
+        Thought: I now know the final answer
+        Final Answer: {output}
+        """
+        nuggt = nuggt + tools_description + output_format
+        st.text(nuggt)
+        st.text(initialise_agent(nuggt, variable_dictionary))
+
+if __name__ == "__main__":
+    main()
 
