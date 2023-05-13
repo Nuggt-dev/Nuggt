@@ -211,15 +211,54 @@ def get_output(output, output_type):
         "code file": st.download_button("Download code file", output),
     }
     return output_map[output_type]
-
     
 def main():
     st.title('Nuggt.io')
 
-    # UI for entering user_input
+    with st.sidebar:
+        st.title("How to use")
 
-    with st.expander("See how it works"):
-        st.write("The chart above shows some numbers I picked for you. I rolled actual dice for these, so they are *guaranteed* to be random.")
+        st.markdown("""
+        **Step 1:** Write your instruction. Below are variables provided:
+
+        - **Define user input:** 
+        {text: variable name}
+        {upload: file name} -> (code, image, video, text, pdf, excel, ppt, word)
+
+        - **Define tools:** 
+        {tool: python, search, video_tool, llm, stable_diffusion, generate_video, image_caption}
+
+        **Step 2:** Generate!
+        """)
+
+        st.markdown("---")
+
+        st.title("About")
+        st.markdown("""
+        Nuggt allows you to build and share end to end applications using large language model.
+        """)
+
+        st.markdown("---")
+
+        st.title("Use Cases")
+
+        st.subheader("Creators Screen")
+        st.markdown("""
+        **Prompt (textbox):** Generate a {input:image_prompt} using {tool:stablediffusion} and save it as {input:file_name}.
+        
+        **Output format (textbox):** Acknowledgement.
+        """)
+
+        st.subheader("Users Screen")
+        st.markdown("""
+        Everything tagged as “text” becomes a textbox. Everything tagged as “upload” becomes an upload. 
+        """)
+
+        st.markdown("""
+        **Enter your prompt to generate an image (textbox):** Input to this textbox replaces “input:image” in the prompt.
+        
+        **Placeholder Enter the file name (textbox):** Input to this textbox replaces “input:file_name” in the prompt.
+        """)
 
     user_input = st.text_input("Enter your instruction: ", key="enter_instruction")
     if user_input:
@@ -245,6 +284,7 @@ def main():
         # st.text(initialise_agent(nuggt, variable_dictionary))
         get_output(initialise_agent(nuggt, variable_dictionary), output)
 
+        # st.stop()
 if __name__ == "__main__":
     main()
 
