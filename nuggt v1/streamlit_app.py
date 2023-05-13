@@ -205,6 +205,10 @@ def main():
     st.title('Nuggt.io')
 
     # UI for entering user_input
+
+    with st.expander("See how it works"):
+        st.write("The chart above shows some numbers I picked for you. I rolled actual dice for these, so they are *guaranteed* to be random.")
+
     user_input = st.text_input("Enter your instruction: ", key="enter_instruction")
     if user_input:
         # Process user_input
@@ -225,7 +229,7 @@ def main():
         nuggt = nuggt + tools_description + output_format
         # st.text(nuggt)
         st.text(initialise_agent(nuggt, variable_dictionary))
-
+    
 if __name__ == "__main__":
     main()
 
