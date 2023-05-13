@@ -1,8 +1,6 @@
-def integrate_function(func, a, b, n):
-    delta_x = (b - a) / n
-    result = 0
-    x = a
-    for i in range(n):
-        result += func(x) * delta_x
-        x += delta_x
-    return result
+def integrate(func, a, b, n):
+    h = (b - a) / n
+    s = (func(a) + func(b)) / 2
+    for i in range(1, n):
+        s += func(a + i * h)
+    return h * s
