@@ -14,6 +14,7 @@ import sys
 import json
 import re
 import os
+import glob
 import streamlit as st
 
 openai.api_key = "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"
@@ -114,7 +115,7 @@ def generate_video(query):
 
 def get_tool_info(tool_name):
     tools = {
-        "python": {"type": "tool", "name": "python", "use": "A Python shell. Use this to execute python code. Input should be a valid python code. If you want to see the output of a value, you should print it out with `print(...)`. Assume all packages are already installed.", "input": "Input should be a valid python code. Ensure proper indentation", "function": python},
+        "python": {"type": "tool", "name": "python", "use": f"A Python shell. Use this to execute python code. Input should be a valid python code. If you want to see the output of a value, you should print it out with `print(...)`. Assume that the package is already installed. You can try pip install package-name", "input": "Input should be a valid python code. Ensure proper indentation", "function": python},
         "search": {"type": "tool", "name": "search", "use": "Use this tool to get information from the internet", "input": "Input should be the query you want to search", "function": search},
         "video_tool": {"type": "tool", "name": "video_tool", "use": "useful when you want to retrieve information from a video", "input": "The input should be a JSON of the following format:\n{\"video_url\": \"URL of the video\", \"information\": \"the information you want to retrieve from the video\"}", "function": video_tool},
         "llm": {"type": "tool", "name": "llm", "use": "useful to get answer from an llm model", "input": "The input should be in the following format:\n{\"prompt\": \"The prompt to initialise the LLM\", \"input\": \"The input to the LLM\"}", "function": custom_llm},
@@ -129,12 +130,14 @@ def nuggt(user_input, output_format, variables):
     tools_description = "\n\nYou can use the following tools:\n\n" 
     value_dict = {}
     form_user = st.form("user-form")
+    output_type = ""
     for variable in variables:
         type = variable.split(":")[0]
         choice = variable.split(":")[1]
         if type == "text":
             if choice not in value_dict.keys():
                 temp = form_user.text_input(f"Enter value for {choice}: ")
+
                 replace_string = "{" + variable + "}"
                 user_input = user_input.replace(replace_string, "<" + temp + ">")
                 value_dict[choice] = temp
@@ -176,11 +179,20 @@ def nuggt(user_input, output_format, variables):
     print(submit)
     if submit:
         st.write(initialise_agent(nuggt, value_dict))
+        # with open("path_to_your_file", "rb") as file:
+        #     st.download_button(
+        #         "Download file",
+        #         file.read(),
+        #         file_name="your_file_name.txt",
+        #         mime="text/plain",
+        #     )
+
         
 def initialise_agent(nuggt, value_dict):   
     print("hello")
     messages = [{"role": "user", "content": nuggt}]
     output = ""
+    log_expander = st.expander('Logs')  # create expander
     while(True):
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -190,7 +202,9 @@ def initialise_agent(nuggt, value_dict):
         )
         output = response.choices[0].message["content"]
         output = output.replace("Observation:", "")
-        st.write(output + "\n")
+        with log_expander:  # write to expander
+            st.write(output + "\n")
+
         if "\nFinal Answer:" in output:
             # print(output)
             return output.split("Final Answer: ")[1]
@@ -205,31 +219,49 @@ def initialise_agent(nuggt, value_dict):
         action = match.group(1).strip()
         action_input = match.group(2)
         observation = value_dict[action](action_input)
-        st.write(f"Observation: {observation}\n")
+        # st.write(f"Observation: {observation}\n")
         output = output + "\nObservation: " + observation + "\nThought: "
         print(output)
         messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
         #print(messages[0]["content"])
 
+def get_most_recent_file(dir_path):
+    # Get a list of all files in directory
+    files = glob.glob(dir_path + "/*")
+    
+    if not files:
+        return None
+    
+    # Find the most recent file
+    most_recent_file = max(files, key=os.path.getctime)
 
+    return most_recent_file
     
 def main():
     st.title('Nuggt.io')
 
-    # UI for entering user_input
-
-    with st.expander("See how it works"):
+    with st.expander("How it works"):
         st.write("The chart above shows some numbers I picked for you. I rolled actual dice for these, so they are *guaranteed* to be random.")
     
-    #form = st.form("app-form")
-    user_input = st.text_input("Enter your instruction: ", key="enter_instruction")
+    user_input = st.text_area("Enter your instruction: ", key="enter_instruction")
     output_format = st.text_input("Enter output format: ", key="output")
-    #submit = form.form_submit_button("Submit")
+
     if user_input and output_format:
-    #if submit:
-        # Process user_input
         variables = extract_variables(user_input)
         nuggt(user_input, output_format, variables)
+
+        most_recent_file = get_most_recent_file("path_to_your_repo")
+
+        # Provide a download button for the file
+        with open(most_recent_file, "rb") as file:
+            file_content = file.read()
+
+        st.download_button(
+            label="Download file",
+            data=file_content,
+            file_name=os.path.basename(most_recent_file),
+            mime="application/octet-stream",
+        )
         
 if __name__ == "__main__":
     main()

@@ -1,9 +1,0 @@
-Meeting Minutes
-
-Meeting Date: 2022-01-01
-Attendees: John, Jane, Alice, Bob
-Agenda: Project Update, Budget Review, Timeline Discussion
-Minutes:
-1. John presented the project update.
-2. Jane reviewed the budget and suggested changes.
-3. Alice and Bob discussed the timeline and agreed on a new deadline.
