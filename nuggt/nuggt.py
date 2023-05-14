@@ -17,6 +17,8 @@ import os
 import glob
 import streamlit as st
 
+st.set_page_config(page_title="Nuggt", layout="wide")
+
 openai.api_key = "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"
 os.environ["OPENAI_API_KEY"] = "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"
 os.environ["SERPER_API_KEY"] = "9cae0f9d724d3cb2e51211d8e49dfbdc22ab279b"
@@ -179,14 +181,6 @@ def nuggt(user_input, output_format, variables):
     print(submit)
     if submit:
         st.write(initialise_agent(nuggt, value_dict))
-        # with open("path_to_your_file", "rb") as file:
-        #     st.download_button(
-        #         "Download file",
-        #         file.read(),
-        #         file_name="your_file_name.txt",
-        #         mime="text/plain",
-        #     )
-
         
 def initialise_agent(nuggt, value_dict):   
     print("hello")
@@ -240,28 +234,73 @@ def get_most_recent_file(dir_path):
 def main():
     st.title('Nuggt.io')
 
-    with st.expander("How it works"):
-        st.write("The chart above shows some numbers I picked for you. I rolled actual dice for these, so they are *guaranteed* to be random.")
-    
-    user_input = st.text_area("Enter your instruction: ", key="enter_instruction")
-    output_format = st.text_input("Enter output format: ", key="output")
+    col1, col2 = st.columns([2, 3], gap="large")
 
-    if user_input and output_format:
-        variables = extract_variables(user_input)
-        nuggt(user_input, output_format, variables)
+    with col1:
+        st.subheader("How to use")
 
-        most_recent_file = get_most_recent_file("path_to_your_repo")
+        st.markdown("""
+        **Step 1:** Write your instruction. Below are variables provided:
 
-        # Provide a download button for the file
-        with open(most_recent_file, "rb") as file:
-            file_content = file.read()
+        - **Define user input:** 
+            - `{text: variable name}`. Eg, `{text:stock_name}`, `{text:youtube_url}`
+            - `{upload: file name}`. Eg, `{upload: annual_report.pdf}`, `{upload: main.py}`
 
-        st.download_button(
-            label="Download file",
-            data=file_content,
-            file_name=os.path.basename(most_recent_file),
-            mime="application/octet-stream",
-        )
+        - **Define tools:** 
+            - `{tool: tool_name}`. Eg, python, search, video_tool, llm, stable_diffusion, generate_video, image_caption
+
+        **Step 2:** Define your output format to be an "Acknowledgement".
+
+        **Step 3:** Generate your application. 
+
+        **Step 4:** Use your application by providing it input and downloading your output.
+        """)
+
+        st.markdown("---")
+
+        st.subheader("About")
+        st.markdown("""
+        **Nuggt** allows you to build and share end-to-end applications using large language model. As we are currently in alpha, we appreciate feedback to improve the platform and the responses.
+        """)
+
+        st.markdown("---")
+
+        st.subheader("Use Cases")
+
+        st.markdown("""
+        **Create a finance bot to get Moving Average Convergence/Divergence indicator over the last 7 days**
+
+        **Instructions:** Using yfinance api, which is already installed, pull the last 7 days OHLC data for `{text:stock_name}` using `{tool:python}`, calculate the MACD and save only the MACD to a text file called `{text:file_name}` in the project repository using `{tool:python}`. If you are stuck in a loop, try another strategy.
+
+        **Input:** stock_name is **TSLA**, file_name is **tsla_macd.txt**.
+
+        **Create an image bot that takes in an image as inspiration and generates variations of it using stable diffusion**
+
+        **Instructions:** Take in an image: `{upload:inspiration_image}` using `{tool:python}` and come up with a creative prompt that matches the contents of the image. Then use `{tool:stablediffusion}` to generate an image save it as `{text:file_name}`.
+
+        **Input:** inspiration_image is a **.png file** that you upload, file_name is **generated_image.png**.
+        """)
+
+    with col2:
+        user_input = st.text_area("Enter your instruction: ", key="enter_instruction")
+        output_format = st.text_input("Enter output format: ", key="output")
+
+        if user_input and output_format:
+            variables = extract_variables(user_input)
+            nuggt(user_input, output_format, variables)
+
+            most_recent_file = get_most_recent_file("path_to_your_repo")
+
+            # Provide a download button for the file
+            with open(most_recent_file, "rb") as file:
+                file_content = file.read()
+
+            st.download_button(
+                label="Download file",
+                data=file_content,
+                file_name=os.path.basename(most_recent_file),
+                mime="application/octet-stream",
+            )
         
 if __name__ == "__main__":
     main()
