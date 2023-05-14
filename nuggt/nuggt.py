@@ -104,7 +104,7 @@ def custom_llm(query):
 
     return response.choices[0].message["content"].strip()
 
-def stablediffusion(query):
+def stable_diffusion(query):
     prompt = StableDiffusionPromptGeneratorTool().langchain.run(query)
     #return StableDiffusionTool().langchain.run(query)
     return StableDiffusionTool().run(prompt)
@@ -121,7 +121,7 @@ def get_tool_info(tool_name):
         "search": {"type": "tool", "name": "search", "use": "Use this tool to get information from the internet", "input": "Input should be the query you want to search", "function": search},
         "video_tool": {"type": "tool", "name": "video_tool", "use": "useful when you want to retrieve information from a video", "input": "The input should be a JSON of the following format:\n{\"video_url\": \"URL of the video\", \"information\": \"the information you want to retrieve from the video\"}", "function": video_tool},
         "llm": {"type": "tool", "name": "llm", "use": "useful to get answer from an llm model", "input": "The input should be in the following format:\n{\"prompt\": \"The prompt to initialise the LLM\", \"input\": \"The input to the LLM\"}", "function": custom_llm},
-        "stablediffusion": {"type": "tool", "name": "stablediffusion", "use": "Use this to generate an image from a prompt. This tool will return the path to the generated image.", "input": "the prompt to generate the image", "function": stablediffusion},
+        "stable_diffusion": {"type": "tool", "name": "stable_diffusion", "use": "Use this to generate an image from a prompt. This tool will return the path to the generated image.", "input": "the prompt to generate the image", "function": stable_diffusion},
         "generate_video": {"type": "tool", "name": "generate_video", "use": "Use this to generate a video from a prompt. This tool will return the path to the generated video.", "input": "the prompt to generate the video", "function": generate_video},
         "image_caption": {"type": "tool", "name": "image_caption", "use": "Use this to caption an image.", "input": "the path to the image", "function": image_caption},
         }
@@ -276,7 +276,7 @@ def main():
 
         **Create an image bot that takes in an image as inspiration and generates variations of it using stable diffusion**
 
-        **Instructions:** Take in an image: `{upload:inspiration_image}` using `{tool:python}` and come up with a creative prompt that matches the contents of the image. Then use `{tool:stablediffusion}` to generate an image save it as `{text:file_name}`.
+        **Instructions:** Take in an image: `{upload:inspiration_image}` using `{tool:python}` and come up with a creative prompt that matches the contents of the image. Then use `{tool:stable_diffusion}` to generate an image save it as `{text:file_name}`.
 
         **Input:** inspiration_image is a **.png file** that you upload, file_name is **generated_image.png**.
         """)
