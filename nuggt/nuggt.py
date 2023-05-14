@@ -208,6 +208,7 @@ def initialise_agent(nuggt, value_dict):
     output = ""
     log_expander = st.expander('Logs')  # create expander
     while(True):
+        print("agent called")
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=messages,
