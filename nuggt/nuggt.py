@@ -18,7 +18,7 @@ import glob
 import streamlit as st
 
 st.set_page_config(page_title="Nuggt", layout="wide")
-
+count = 0
 openai.api_key = "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"
 os.environ["OPENAI_API_KEY"] = "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"
 os.environ["SERPER_API_KEY"] = "9cae0f9d724d3cb2e51211d8e49dfbdc22ab279b"
@@ -53,6 +53,17 @@ class PythonREPLa:
 
 python_repl = PythonREPLa()
 
+def extract_code_from_block(text):
+    if "!pip" in text:
+        return "The package is successfully installed."
+    pattern = r'```python\n(.*?)\n```'
+    code = re.search(pattern, text, re.DOTALL)
+    
+    if code:
+        return code.group(1).strip()
+    else:
+        return text
+
 def extract_variables(input_string):
     pattern = r'\{(.*?)\}'
     variables = re.findall(pattern, input_string)
@@ -77,13 +88,17 @@ def video_tool(query):
     return chain.run(input_documents=docs, question=query)
 
 def python(code):
-    global python_repl
-    print(f"The code before changes:\n{code}")
-    code = code.strip("```")
-    code = code.strip("python\n")
+    code = extract_code_from_block(code)
     result = python_repl.run(code) 
-    print(f"The code after changes:\n{code}")
-    print(f"Output of the code:\n{result}")
+    #print(f"The code after changes:\n{code}")
+    #print(f"Output of the code:\n{result}")
+    return result  
+
+def display(code):
+    code = extract_code_from_block(code)
+    result = python_repl.run(code) 
+    #print(f"The code after changes:\n{code}")
+    #print(f"Output of the code:\n{result}")
     return result  
 
 def search(query):
@@ -115,6 +130,10 @@ def image_caption(path):
 def generate_video(query):
     return TextToVideoTool().langchain.run(query)
 
+def human(query):
+    pass
+    
+
 def get_tool_info(tool_name):
     tools = {
         "python": {"type": "tool", "name": "python", "use": f"A Python shell. Use this to execute python code. Input should be a valid python code. If you want to see the output of a value, you should print it out with `print(...)`. Assume that the package is already installed. You can try pip install package-name", "input": "Input should be a valid python code. Ensure proper indentation", "function": python},
@@ -124,6 +143,8 @@ def get_tool_info(tool_name):
         "stable_diffusion": {"type": "tool", "name": "stable_diffusion", "use": "Use this to generate an image from a prompt. This tool will return the path to the generated image.", "input": "the prompt to generate the image", "function": stable_diffusion},
         "generate_video": {"type": "tool", "name": "generate_video", "use": "Use this to generate a video from a prompt. This tool will return the path to the generated video.", "input": "the prompt to generate the video", "function": generate_video},
         "image_caption": {"type": "tool", "name": "image_caption", "use": "Use this to caption an image.", "input": "the path to the image", "function": image_caption},
+        "display" : {"type": "tool", "name": "display", "use": "Use this to display things using streamlit", "input": "The input should be a valid python code using the streamlit library", "function": display},
+        "human": {"type": "tool", "name": "human", "use": "Use this to get input from the user", "input": "The input should be the information you want from the user.", "function": human},
         }
     return tools[tool_name]
 
@@ -151,8 +172,9 @@ def nuggt(user_input, output_format, variables):
             if choice not in value_dict.keys():
                 uploaded_file = form_user.file_uploader(f"Upload {choice}") 
                 replace_string = "{" + variable + "}"
-                user_input = user_input.replace(replace_string, "<" + uploaded_file.name + ">")
-                value_dict[choice] = uploaded_file.name
+                if uploaded_file:
+                    user_input = user_input.replace(replace_string, "<" + uploaded_file.name + ">")
+                    value_dict[choice] = uploaded_file.name
             else:
                 replace_string = "{" + variable + "}"
                 user_input = user_input.replace(replace_string, "<" + value_dict[choice] + ">")
@@ -178,12 +200,10 @@ def nuggt(user_input, output_format, variables):
         """
     nuggt = user_input + tools_description + agent_instruction
     submit = form_user.form_submit_button("Submit")
-    print(submit)
     if submit:
         st.write(initialise_agent(nuggt, value_dict))
         
 def initialise_agent(nuggt, value_dict):   
-    print("hello")
     messages = [{"role": "user", "content": nuggt}]
     output = ""
     log_expander = st.expander('Logs')  # create expander
@@ -200,24 +220,25 @@ def initialise_agent(nuggt, value_dict):
             st.write(output + "\n")
 
         if "\nFinal Answer:" in output:
-            # print(output)
+            print(output)
             return output.split("Final Answer: ")[1]
         regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
         match = re.search(regex, output, re.DOTALL)
         if not match:
-           print("I was here")
-           output = "You are not following the format. Please follow the given format."
-           messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
-           continue
-           #raise ValueError(f"Could not parse LLM output: `{output}`")
+            print("I was here")
+            #print(output)
+            output = "You are not following the format. Please follow the given format."
+            messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
+            continue
+        #raise ValueError(f"Could not parse LLM output: `{output}`")
         action = match.group(1).strip()
         action_input = match.group(2)
         observation = value_dict[action](action_input)
         # st.write(f"Observation: {observation}\n")
         output = output + "\nObservation: " + observation + "\nThought: "
-        print(output)
         messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
-        #print(messages[0]["content"])
+        print(messages[0]["content"])
+        print("---"*30)
 
 def get_most_recent_file(dir_path):
     # Get a list of all files in directory
@@ -289,7 +310,7 @@ def main():
             variables = extract_variables(user_input)
             nuggt(user_input, output_format, variables)
 
-            most_recent_file = get_most_recent_file("path_to_your_repo")
+            """most_recent_file = get_most_recent_file("path_to_your_repo")
 
             # Provide a download button for the file
             with open(most_recent_file, "rb") as file:
@@ -300,7 +321,7 @@ def main():
                 data=file_content,
                 file_name=os.path.basename(most_recent_file),
                 mime="application/octet-stream",
-            )
+            )"""
         
 if __name__ == "__main__":
     main()
