@@ -18,6 +18,8 @@ import glob
 import streamlit as st
 import browse
 import requests
+from trubrics.integrations.streamlit import FeedbackCollector
+
 
 st.set_page_config(page_title="Nuggt", layout="wide")
 count = 0
@@ -43,6 +45,9 @@ def save_to_sheets(userInput, outputFormat, feedback, logs):
         requests.post(url, data = data)
     except:
         print("Error!")
+
+def is_file(filename):
+    return os.path.isfile(filename)
 
 class PythonREPLa:
     def __init__(self):
@@ -155,7 +160,7 @@ def custom_llm(query):
         {"role": "user", "content": data["input"]}
     ]
     response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=messages,
             temperature=0, 
     )
@@ -205,6 +210,10 @@ def nuggt(user_input, output_format, variables):
         if type == "text":
             if choice not in value_dict.keys():
                 temp = form_user.text_input(f"Enter value for {choice}: ")
+                #Check if text input is a file to be created
+                if (is_file(temp)):
+                    new_file_path = os.path.join(os.getcwd(), temp)
+                    print(new_file_path)
 
                 replace_string = "{" + variable + "}"
                 user_input = user_input.replace(replace_string, "<" + temp + ">")
@@ -384,6 +393,13 @@ def main():
             #     file_name=os.path.basename(most_recent_file),
             #     mime="application/octet-stream",
             # )"""
+    
+    
+    collector = FeedbackCollector()
+    collector.st_feedback(
+        feedback_type="faces",
+        path="thumbs_feedback.json"
+    )
         
 if __name__ == "__main__":
     main()

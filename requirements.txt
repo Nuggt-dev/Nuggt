@@ -11,3 +11,5 @@ gsheetsdb>=0.1.13.1
 shillelagh>=1.2.4
 gradio_tools>=0.0.9
 gspread>=5.7.2
+config>=0.5.1
+google-api-python-client>=2.86.0
