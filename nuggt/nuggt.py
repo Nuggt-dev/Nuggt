@@ -16,14 +16,70 @@ import re
 import os
 import glob
 import streamlit as st
+import gspread
+from google.oauth2 import service_account
+import pandas as pd
+from shillelagh.backends.apsw.db import connect
 
 st.set_page_config(page_title="Nuggt", layout="wide")
 count = 0
-openai.api_key = "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"
-os.environ["OPENAI_API_KEY"] = "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"
-os.environ["SERPER_API_KEY"] = "9cae0f9d724d3cb2e51211d8e49dfbdc22ab279b"
-os.environ["SCENEX_API_KEY"] = "f7GcmHvrJY050vmMn85L:1b7202dcbd71af619f044f87fc6721c5233c24e3cd64e2ee9c9ff69e29647024"
+openai.api_key = st.secrets["openai_api_key"]
+os.environ["OPENAI_API_KEY"] = st.secrets["openai_api_key"]
+os.environ["SERPER_API_KEY"] = st.secrets["serper_api_key"]
+os.environ["SCENEX_API_KEY"] = st.secrets["scenex_api_key"]
 search_api = GoogleSerperAPIWrapper()
+# scopes = [
+#     "https://www.googleapis.com/auth/spreadsheets",
+# ]
+# skey = st.secrets["gcp_service_account"]
+# credentials = service_account.Credentials.from_service_account_info(
+#     st.secrets["gcp_service_account"],
+#     scopes=[
+#         "https://www.googleapis.com/auth/spreadsheets","https://www.googleapis.com/auth/drive"
+#     ],
+# )
+# conn = connect(credentials=credentials)
+# client = gspread.authorize(credentials)
+
+# sheet_id = '1oh5koIOI35pZeKZEPpKTW3aPiOIVxaVasj5d2YXx7w8'
+# csv_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
+# database_df = pd.read_csv(csv_url, on_bad_lines='skip')
+
+# database_df = database_df.astype(str)
+# sheet_url = st.secrets["private_gsheets_url"] #this information should be included in streamlit secret
+# sheet = client.open_by_url(sheet_url).sheet1
+# sheet.update([database_df.columns.values.tolist()] + database_df.values.tolist())
+# st.success('Data has been written to Google Sheets')
+
+sheet_url = st.secrets["private_gsheets_url"]
+
+def create_connection():
+    #  if 'email' in st.session_state:
+    credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"], 
+    scopes=["https://www.googleapis.com/auth/spreadsheets",],)
+    connection = connect(":memory:", adapter_kwargs={
+        "gsheetsapi" : { 
+        "service_account_info" : {
+            "type" : st.secrets["gcp_service_account"]["type"],
+            "project_id" : st.secrets["gcp_service_account"]["project_id"],
+            "private_key_id" : st.secrets["gcp_service_account"]["private_key_id"],
+            "private_key" : st.secrets["gcp_service_account"]["private_key"],
+            "client_email" : st.secrets["gcp_service_account"]["client_email"],
+            "client_id" : st.secrets["gcp_service_account"]["client_id"],
+            "auth_uri" : st.secrets["gcp_service_account"]["auth_uri"],
+            "token_uri" : st.secrets["gcp_service_account"]["token_uri"],
+            "auth_provider_x509_cert_url" : st.secrets["gcp_service_account"]["auth_provider_x509_cert_url"],
+            "client_x509_cert_url" : st.secrets["gcp_service_account"]["client_x509_cert_url"],
+            }
+        },
+    })
+    return connection.cursor()
+
+def execute_query(query):
+    cursor = create_connection()
+    rows = cursor.execute(query)
+    rows = rows.fetchall()
 
 class PythonREPLa:
     def __init__(self):
@@ -252,9 +308,12 @@ def get_most_recent_file(dir_path):
     most_recent_file = max(files, key=os.path.getctime)
 
     return most_recent_file
-    
+
 def main():
     st.title('Nuggt.io')
+
+    query = "INSERT INTO user_input (Column1, Column2, Column3) VALUES ('Value1', 'Value2', 'Value3');"
+    execute_query(query)
 
     col1, col2 = st.columns([2, 3], gap="large")
 
