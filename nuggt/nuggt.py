@@ -16,10 +16,7 @@ import re
 import os
 import glob
 import streamlit as st
-import gspread
-from google.oauth2 import service_account
-import pandas as pd
-from shillelagh.backends.apsw.db import connect
+import requests
 
 st.set_page_config(page_title="Nuggt", layout="wide")
 count = 0
@@ -28,58 +25,20 @@ os.environ["OPENAI_API_KEY"] = st.secrets["openai_api_key"]
 os.environ["SERPER_API_KEY"] = st.secrets["serper_api_key"]
 os.environ["SCENEX_API_KEY"] = st.secrets["scenex_api_key"]
 search_api = GoogleSerperAPIWrapper()
-# scopes = [
-#     "https://www.googleapis.com/auth/spreadsheets",
-# ]
-# skey = st.secrets["gcp_service_account"]
-# credentials = service_account.Credentials.from_service_account_info(
-#     st.secrets["gcp_service_account"],
-#     scopes=[
-#         "https://www.googleapis.com/auth/spreadsheets","https://www.googleapis.com/auth/drive"
-#     ],
-# )
-# conn = connect(credentials=credentials)
-# client = gspread.authorize(credentials)
 
-# sheet_id = '1oh5koIOI35pZeKZEPpKTW3aPiOIVxaVasj5d2YXx7w8'
-# csv_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
-# database_df = pd.read_csv(csv_url, on_bad_lines='skip')
+def save_to_sheets(userInput, outputFormat, feedback, logs):
+    url = "https://docs.google.com/forms/d/1PveqD5klH2geQvI3nlkI6l-chBctNz6O-jmpwSO2FYk/formResponse"
 
-# database_df = database_df.astype(str)
-# sheet_url = st.secrets["private_gsheets_url"] #this information should be included in streamlit secret
-# sheet = client.open_by_url(sheet_url).sheet1
-# sheet.update([database_df.columns.values.tolist()] + database_df.values.tolist())
-# st.success('Data has been written to Google Sheets')
-
-sheet_url = st.secrets["private_gsheets_url"]
-
-def create_connection():
-    #  if 'email' in st.session_state:
-    credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"], 
-    scopes=["https://www.googleapis.com/auth/spreadsheets",],)
-    connection = connect(":memory:", adapter_kwargs={
-        "gsheetsapi" : { 
-        "service_account_info" : {
-            "type" : st.secrets["gcp_service_account"]["type"],
-            "project_id" : st.secrets["gcp_service_account"]["project_id"],
-            "private_key_id" : st.secrets["gcp_service_account"]["private_key_id"],
-            "private_key" : st.secrets["gcp_service_account"]["private_key"],
-            "client_email" : st.secrets["gcp_service_account"]["client_email"],
-            "client_id" : st.secrets["gcp_service_account"]["client_id"],
-            "auth_uri" : st.secrets["gcp_service_account"]["auth_uri"],
-            "token_uri" : st.secrets["gcp_service_account"]["token_uri"],
-            "auth_provider_x509_cert_url" : st.secrets["gcp_service_account"]["auth_provider_x509_cert_url"],
-            "client_x509_cert_url" : st.secrets["gcp_service_account"]["client_x509_cert_url"],
-            }
-        },
-    })
-    return connection.cursor()
-
-def execute_query(query):
-    cursor = create_connection()
-    rows = cursor.execute(query)
-    rows = rows.fetchall()
+    data = {
+        'entry.2013000889': userInput,
+        'entry.586411750': outputFormat,
+        'entry.1340987871': feedback,
+        'entry.697215161': logs
+    }
+    try:
+        requests.post(url, data = data)
+    except:
+        print("Error!")
 
 class PythonREPLa:
     def __init__(self):
@@ -258,6 +217,7 @@ def nuggt(user_input, output_format, variables):
     submit = form_user.form_submit_button("Submit")
     if submit:
         st.write(initialise_agent(nuggt, value_dict))
+        save_to_sheets("-", "-", "-", initialise_agent(nuggt, value_dict))
         
 def initialise_agent(nuggt, value_dict):   
     messages = [{"role": "user", "content": nuggt}]
@@ -312,9 +272,6 @@ def get_most_recent_file(dir_path):
 def main():
     st.title('Nuggt.io')
 
-    query = "INSERT INTO user_input (Column1, Column2, Column3) VALUES ('Value1', 'Value2', 'Value3');"
-    execute_query(query)
-
     col1, col2 = st.columns([2, 3], gap="large")
 
     with col1:
@@ -367,21 +324,22 @@ def main():
         output_format = st.text_input("Enter output format: ", key="output")
 
         if user_input and output_format:
+            save_to_sheets(user_input, output_format, "-", "-")
             variables = extract_variables(user_input)
             nuggt(user_input, output_format, variables)
 
-            """most_recent_file = get_most_recent_file("path_to_your_repo")
+            # """most_recent_file = get_most_recent_file("path_to_your_repo")
 
-            # Provide a download button for the file
-            with open(most_recent_file, "rb") as file:
-                file_content = file.read()
+            # # Provide a download button for the file
+            # with open(most_recent_file, "rb") as file:
+            #     file_content = file.read()
 
-            st.download_button(
-                label="Download file",
-                data=file_content,
-                file_name=os.path.basename(most_recent_file),
-                mime="application/octet-stream",
-            )"""
+            # st.download_button(
+            #     label="Download file",
+            #     data=file_content,
+            #     file_name=os.path.basename(most_recent_file),
+            #     mime="application/octet-stream",
+            # )"""
         
 if __name__ == "__main__":
     main()
