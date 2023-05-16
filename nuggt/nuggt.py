@@ -4,7 +4,7 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
-from langchain.utilities import PythonREPL, GoogleSerperAPIWrapper
+from langchain.utilities import GoogleSerperAPIWrapper, GoogleSearchAPIWrapper
 from gradio_tools.tools import (StableDiffusionTool, ImageCaptioningTool, StableDiffusionPromptGeneratorTool, TextToVideoTool)
 from langchain.tools import SceneXplainTool
 from io import StringIO
@@ -16,14 +16,18 @@ import re
 import os
 import glob
 import streamlit as st
+import browse
 import requests
 
 st.set_page_config(page_title="Nuggt", layout="wide")
 count = 0
-openai.api_key = st.secrets["openai_api_key"]
-os.environ["OPENAI_API_KEY"] = st.secrets["openai_api_key"]
-os.environ["SERPER_API_KEY"] = st.secrets["serper_api_key"]
-os.environ["SCENEX_API_KEY"] = st.secrets["scenex_api_key"]
+openai.api_key = "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"
+os.environ["OPENAI_API_KEY"] = "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"
+os.environ["SERPER_API_KEY"] = "9cae0f9d724d3cb2e51211d8e49dfbdc22ab279b"
+os.environ["SCENEX_API_KEY"] = "f7GcmHvrJY050vmMn85L:1b7202dcbd71af619f044f87fc6721c5233c24e3cd64e2ee9c9ff69e29647024"
+os.environ["GOOGLE_API_KEY"] = "AIzaSyBq3rhqM03-hqLbDqHeKHbc8K2qSgqMW7Q"
+os.environ["GOOGLE_CSE_ID"] = "a60ee944812a441d9"
+
 search_api = GoogleSerperAPIWrapper()
 
 def save_to_sheets(userInput, outputFormat, feedback, logs):
@@ -71,13 +75,37 @@ python_repl = PythonREPLa()
 def extract_code_from_block(text):
     if "!pip" in text:
         return "The package is successfully installed."
-    pattern = r'```python\n(.*?)\n```'
+    #pattern = r'```python\n(.*?)\n```'
+    pattern = r'```\n(.*?)\n```'
     code = re.search(pattern, text, re.DOTALL)
     
     if code:
         return code.group(1).strip()
     else:
         return text
+
+def google(query):
+    search = GoogleSearchAPIWrapper()
+    return str(search.results(query, 5))
+    """answer = []
+    for result in search.results(query, 2):
+        bw_input = {"url": result["link"], "information": query}
+        print(browse_website(str(bw_input).replace("'", '"')))
+        answer.append({"information": browse_website(str(bw_input).replace("'", '"')), "source": result["link"]})
+    
+    return str(answer)"""
+
+def browse_website(query):
+    """Browse a website and return the summary and links"""
+    data = json.loads(query)
+    text = browse.scrape_text(data["url"])
+    embeddings = OpenAIEmbeddings()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    docs = text_splitter.split_text(text)
+    db = FAISS.from_texts(docs, embeddings)
+    docs = db.similarity_search(data["information"])
+    chain = load_qa_chain(OpenAI(), chain_type="stuff")
+    return chain.run(input_documents=docs, question=data["information"])
 
 def extract_variables(input_string):
     pattern = r'\{(.*?)\}'
@@ -127,7 +155,7 @@ def custom_llm(query):
         {"role": "user", "content": data["input"]}
     ]
     response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=messages,
             temperature=0, 
     )
@@ -160,6 +188,8 @@ def get_tool_info(tool_name):
         "image_caption": {"type": "tool", "name": "image_caption", "use": "Use this to caption an image.", "input": "the path to the image", "function": image_caption},
         "display" : {"type": "tool", "name": "display", "use": "Use this to display things using streamlit", "input": "The input should be a valid python code using the streamlit library", "function": display},
         "human": {"type": "tool", "name": "human", "use": "Use this to get input from the user", "input": "The input should be the information you want from the user.", "function": human},
+        "browse_website": {"type": "tool", "name": "browse_website", "use": "Use this to get information from a website", "input": "The input should be in the following format:\n{\"url\": \"URL of the website\", \"information\": \"the information you want to retrieve from the website\"}", "function": browse_website},
+        "google": {"type": "tool", "name": "google", "use": "use it to get google results", "input": "The input should be a google query", "function": google}
         }
     return tools[tool_name]
 
@@ -223,39 +253,53 @@ def initialise_agent(nuggt, value_dict):
     messages = [{"role": "user", "content": nuggt}]
     output = ""
     log_expander = st.expander('Logs')  # create expander
+    generate_new = True
+    flag = True
     while(True):
         print("agent called")
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=messages,
-            temperature=0, 
-            stop=["\nObservation: "]
-        )
-        output = response.choices[0].message["content"]
-        output = output.replace("Observation:", "")
-        with log_expander:  # write to expander
-            st.write(output + "\n")
+        if generate_new:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                temperature=0, 
+                stop=["\nObservation: "]
+            )
+            output = response.choices[0].message["content"]
+            output = output.replace("Observation:", "")
+            with log_expander:  # write to expander
+                st.write(output + "\n")
 
-        if "\nFinal Answer:" in output:
-            print(output)
-            return output.split("Final Answer: ")[1]
-        regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
-        match = re.search(regex, output, re.DOTALL)
-        if not match:
-            print("I was here")
-            #print(output)
-            output = "You are not following the format. Please follow the given format."
-            messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
-            continue
-        #raise ValueError(f"Could not parse LLM output: `{output}`")
-        action = match.group(1).strip()
-        action_input = match.group(2)
-        observation = value_dict[action](action_input)
-        # st.write(f"Observation: {observation}\n")
-        output = output + "\nObservation: " + observation + "\nThought: "
-        messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
-        print(messages[0]["content"])
-        print("---"*30)
+            if "\nFinal Answer:" in output:
+                print(output)
+                return output.split("Final Answer: ")[1]
+            regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
+            match = re.search(regex, output, re.DOTALL)
+            if not match:
+                print("I was here")
+                #print(output)
+                output = "You are not following the format. Please follow the given format."
+                messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
+                continue
+            #raise ValueError(f"Could not parse LLM output: `{output}`")
+            action = match.group(1).strip()
+            action_input = match.group(2)
+            if action != "human":
+                observation = value_dict[action](action_input)
+                output = output + "\nObservation: " + observation + "\nThought: "
+                generate_new = True
+                messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
+                print(messages[0]["content"])
+                print("---"*30)
+            else:
+                generate_new = False
+                
+        else:
+            if flag:
+                observation = st.text_input("Enter input: ")
+                flag = False
+            elif observation:
+                print("hello")
+                break
 
 def get_most_recent_file(dir_path):
     # Get a list of all files in directory
