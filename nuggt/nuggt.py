@@ -18,7 +18,7 @@ import glob
 import streamlit as st
 import browse
 import requests
-from trubrics.integrations.streamlit import FeedbackCollector
+from colorama import Fore
 
 
 st.set_page_config(page_title="Nuggt", layout="wide")
@@ -80,14 +80,9 @@ python_repl = PythonREPLa()
 def extract_code_from_block(text):
     if "!pip" in text:
         return "The package is successfully installed."
-    pattern = r'```python\n(.*?)\n```'
-    #pattern = r'```\n(.*?)\n```'
-    code = re.search(pattern, text, re.DOTALL)
-    
-    if code:
-        return code.group(1).strip()
-    else:
-        return text
+    text = text.replace("`", "")
+    text = text.replace("python", "")
+    return text
 
 def google(query):
     search = GoogleSearchAPIWrapper()
@@ -138,16 +133,44 @@ def video_tool(query):
 def python(code):
     code = extract_code_from_block(code)
     result = python_repl.run(code) 
-    #print(f"The code after changes:\n{code}")
-    #print(f"Output of the code:\n{result}")
+    if "Your code has the following error." in result:
+        result = fix_error(code, result)
+
     return result  
+
+def fix_error(code, result):
+    while "Your code has the following error." in result:
+        error = result.replace("Your code has the following error. Please provide the corrected code.", "")
+        user_input = f"Code:\n{code}\nError:\n{error}"
+
+        #print(f"I am going to correct: {user_input}")
+        print(Fore.RED + "Code needs some correction.")
+        messages = [
+        {"role": "system", "content": "You are a brilliant programmer. When you are presented with a piece of code and an error, you fix the error and output the corrected code in the format: <corrected_code: The corrected python code>"},
+        {"role": "user", "content": user_input}
+        ]
+
+        response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=messages,
+                temperature=0, 
+        )
+
+        code = response.choices[0].message["content"].strip()
+        code = code.replace("<", "").replace("corrected_code: ", "").replace(">", "")
+
+        result = python_repl.run(code)
+    
+    print(Fore.GREEN + "Code has been corrected.")
+    return result
 
 def display(code):
     code = extract_code_from_block(code)
     result = python_repl.run(code) 
-    #print(f"The code after changes:\n{code}")
-    #print(f"Output of the code:\n{result}")
-    return result  
+    if "Your code has the following error." in result:
+        result = fix_error(code, result)
+
+    return result 
 
 def search(query):
     global search_api
@@ -180,11 +203,10 @@ def generate_video(query):
 
 def human(query):
     pass
-    
 
 def get_tool_info(tool_name):
     tools = {
-        "python": {"type": "tool", "name": "python", "use": f"A Python shell. Use this to execute python code. Input should be a valid python code. If you want to see the output of a value, you should print it out with `print(...)`. Assume that the package is already installed. You can try pip install package-name", "input": "Input should be a valid python code. Ensure proper indentation", "function": python},
+        "python": {"type": "tool", "name": "python", "use": "Use this to execute python code. Display your results using the print funçction.", "input": "Input should be a valid python code. Ensure proper indentation", "function": python},
         "search": {"type": "tool", "name": "search", "use": "Use this tool to get information from the internet", "input": "Input should be the query you want to search", "function": search},
         "video_tool": {"type": "tool", "name": "video_tool", "use": "useful when you want to retrieve information from a video", "input": "The input should be a JSON of the following format:\n{\"video_url\": \"URL of the video\", \"information\": \"the information you want to retrieve from the video\"}", "function": video_tool},
         "llm": {"type": "tool", "name": "llm", "use": "useful to get answer from an llm model", "input": "The input should be in the following format:\n{\"prompt\": \"The prompt to initialise the LLM\", \"input\": \"The input to the LLM\"}", "function": custom_llm},
@@ -252,6 +274,24 @@ def nuggt(user_input, output_format, variables):
         Thought: I now know the final answer
         Final Answer: {output_format}
         """
+    
+    agent_instruction = f"""\nUse the following format:
+        Step 1: The first step
+        Action: the action to take, should be one of {tools}.
+        Action Input: the input to the action
+        Observation: the result of the action
+        
+        Step 2: The second step
+        Thought: I now know the final answer
+        Action: the action to take, should be one of {tools}.
+        Action Input: the input to the action
+        Observation: the result of the action
+
+        ... (this Step/Action/Action Input/Observation repeats for all steps)
+        
+        Once you have completed all the steps, your final answer should be in the format:
+        Final Answer: {output_format}
+        """
     nuggt = user_input + tools_description + agent_instruction
     submit = form_user.form_submit_button("Submit")
     if submit:
@@ -265,53 +305,45 @@ def initialise_agent(nuggt, value_dict):
     messages = [{"role": "user", "content": nuggt}]
     output = ""
     log_expander = st.expander('Logs')  # create expander
-    generate_new = True
-    flag = True
     while(True):
-        print("agent called")
-        if generate_new:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0, 
-                stop=["\nObservation: "]
-            )
-            output = response.choices[0].message["content"]
-            output = output.replace("Observation:", "")
-            with log_expander:  # write to expander
-                st.write(output + "\n")
-
-            if "\nFinal Answer:" in output:
-                print(output)
-                return output.split("Final Answer: ")[1]
-            regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
-            match = re.search(regex, output, re.DOTALL)
-            if not match:
-                print("I was here")
-                #print(output)
-                output = "You are not following the format. Please follow the given format."
-                messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
-                continue
-            #raise ValueError(f"Could not parse LLM output: `{output}`")
-            action = match.group(1).strip()
-            action_input = match.group(2)
-            if action != "human":
-                observation = value_dict[action](action_input)
-                output = output + "\nObservation: " + observation + "\nThought: "
-                generate_new = True
-                messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
-                print(messages[0]["content"])
-                print("---"*30)
-            else:
-                generate_new = False
-                
-        else:
-            if flag:
-                observation = st.text_input("Enter input: ")
-                flag = False
-            elif observation:
-                print("hello")
-                break
+        #print(Fore.RED + "agent called")
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=messages,
+            temperature=0, 
+            stop=["\nObservation: "]
+        )
+        output = response.choices[0].message["content"]
+        output = output.replace("Observation:", "")
+        print(Fore.BLUE + output)
+        with log_expander:  # write to expander
+            st.write(output + "\n")
+        regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
+        match = re.search(regex, output, re.DOTALL)
+        if "\nFinal Answer:" in output and not match:
+            #print(Fore.YELLOW + output)
+            return output.split("Final Answer: ")[1]
+        elif "\nFinal Answer:" in output and match:
+            #output = "Your output should have only one pair of Thought/Action/Action Input. Not more than that."
+            print(Fore.YELLOW + "The model's output was shortened")
+            output = output.split("Thought")[0]
+            
+        #regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
+        #match = re.search(regex, output, re.DOTALL)
+        if not match:
+            print(Fore.RED + "The model was sidetracked")
+            #print(output)
+            output = "You are not following the format. Please follow the given format."
+            messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
+            continue
+        #raise ValueError(f"Could not parse LLM output: `{output}`")
+        action = match.group(1).strip()
+        action_input = match.group(2)
+        observation = value_dict[action](action_input)
+        print(Fore.GREEN + "\nObservation: " + observation)
+        output = output + "\nObservation: " + observation + "\nThought: "
+        #print(output)
+        messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
 
 def get_most_recent_file(dir_path):
     # Get a list of all files in directory
