@@ -60,8 +60,8 @@ python_repl = PythonREPLa()
 def extract_code_from_block(text):
     if "!pip" in text:
         return "The package is successfully installed."
-    #pattern = r'```python\n(.*?)\n```'
-    pattern = r'```\n(.*?)\n```'
+    pattern = r'```python\n(.*?)\n```'
+    #pattern = r'```\n(.*?)\n```'
     code = re.search(pattern, text, re.DOTALL)
     
     if code:
@@ -140,7 +140,7 @@ def custom_llm(query):
         {"role": "user", "content": data["input"]}
     ]
     response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=messages,
             temperature=0, 
     )
@@ -243,7 +243,7 @@ def initialise_agent(nuggt, value_dict):
         print("agent called")
         if generate_new:
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4",
                 messages=messages,
                 temperature=0, 
                 stop=["\nObservation: "]
