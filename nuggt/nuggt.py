@@ -17,6 +17,9 @@ import os
 import glob
 import streamlit as st
 import browse
+import requests
+from trubrics.integrations.streamlit import FeedbackCollector
+
 
 st.set_page_config(page_title="Nuggt", layout="wide")
 count = 0
@@ -28,6 +31,23 @@ os.environ["GOOGLE_API_KEY"] = "AIzaSyBq3rhqM03-hqLbDqHeKHbc8K2qSgqMW7Q"
 os.environ["GOOGLE_CSE_ID"] = "a60ee944812a441d9"
 
 search_api = GoogleSerperAPIWrapper()
+
+def save_to_sheets(userInput, outputFormat, feedback, logs):
+    url = "https://docs.google.com/forms/d/1PveqD5klH2geQvI3nlkI6l-chBctNz6O-jmpwSO2FYk/formResponse"
+
+    data = {
+        'entry.2013000889': userInput,
+        'entry.586411750': outputFormat,
+        'entry.1340987871': feedback,
+        'entry.697215161': logs
+    }
+    try:
+        requests.post(url, data = data)
+    except:
+        print("Error!")
+
+def is_file(filename):
+    return os.path.isfile(filename)
 
 class PythonREPLa:
     def __init__(self):
@@ -190,6 +210,10 @@ def nuggt(user_input, output_format, variables):
         if type == "text":
             if choice not in value_dict.keys():
                 temp = form_user.text_input(f"Enter value for {choice}: ")
+                #Check if text input is a file to be created
+                if (is_file(temp)):
+                    new_file_path = os.path.join(os.getcwd(), temp)
+                    print(new_file_path)
 
                 replace_string = "{" + variable + "}"
                 user_input = user_input.replace(replace_string, "<" + temp + ">")
@@ -231,7 +255,11 @@ def nuggt(user_input, output_format, variables):
     nuggt = user_input + tools_description + agent_instruction
     submit = form_user.form_submit_button("Submit")
     if submit:
-        st.write(initialise_agent(nuggt, value_dict))
+        agent = st.write(initialise_agent(nuggt, value_dict))
+        save_to_sheets("-", "-", "-", agent)
+        feedback = st.text_input("Thank you for experimenting with Nuggt! We would appreciate some feedback to help improve the product :smiley:")
+        save_to_sheets("-", "-", feedback, "-")
+
         
 def initialise_agent(nuggt, value_dict):   
     messages = [{"role": "user", "content": nuggt}]
@@ -352,21 +380,23 @@ def main():
         output_format = st.text_input("Enter output format: ", key="output")
 
         if user_input and output_format:
+            save_to_sheets(user_input, output_format, "-", "-")
             variables = extract_variables(user_input)
             nuggt(user_input, output_format, variables)
 
-            """most_recent_file = get_most_recent_file("path_to_your_repo")
+            # """most_recent_file = get_most_recent_file("path_to_your_repo")
 
-            # Provide a download button for the file
-            with open(most_recent_file, "rb") as file:
-                file_content = file.read()
+            # # Provide a download button for the file
+            # with open(most_recent_file, "rb") as file:
+            #     file_content = file.read()
 
-            st.download_button(
-                label="Download file",
-                data=file_content,
-                file_name=os.path.basename(most_recent_file),
-                mime="application/octet-stream",
-            )"""
+            # st.download_button(
+            #     label="Download file",
+            #     data=file_content,
+            #     file_name=os.path.basename(most_recent_file),
+            #     mime="application/octet-stream",
+            # )"""
+
         
 if __name__ == "__main__":
     main()
