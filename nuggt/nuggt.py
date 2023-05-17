@@ -255,8 +255,11 @@ def nuggt(user_input, output_format, variables):
     nuggt = user_input + tools_description + agent_instruction
     submit = form_user.form_submit_button("Submit")
     if submit:
-        st.write(initialise_agent(nuggt, value_dict))
-        save_to_sheets("-", "-", "-", initialise_agent(nuggt, value_dict))
+        agent = st.write(initialise_agent(nuggt, value_dict))
+        save_to_sheets("-", "-", "-", agent)
+        feedback = st.text_input("Thank you for experimenting with Nuggt! We would appreciate some feedback to help improve the product :smiley:")
+        save_to_sheets("-", "-", feedback, "-")
+
         
 def initialise_agent(nuggt, value_dict):   
     messages = [{"role": "user", "content": nuggt}]
@@ -393,13 +396,7 @@ def main():
             #     file_name=os.path.basename(most_recent_file),
             #     mime="application/octet-stream",
             # )"""
-    
-    
-    collector = FeedbackCollector()
-    collector.st_feedback(
-        feedback_type="faces",
-        path="thumbs_feedback.json"
-    )
+
         
 if __name__ == "__main__":
     main()
