@@ -7,6 +7,12 @@ from langchain.llms import OpenAI
 from langchain.utilities import GoogleSerperAPIWrapper, GoogleSearchAPIWrapper
 from gradio_tools.tools import (StableDiffusionTool, ImageCaptioningTool, StableDiffusionPromptGeneratorTool, TextToVideoTool)
 from langchain.tools import SceneXplainTool
+from streamlit_option_menu import option_menu
+from PyPDF2 import PdfReader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.chat_models import ChatOpenAI
+from langchain.document_loaders import PyPDFLoader, PyMuPDFLoader, SeleniumURLLoader
+from langchain.chains import RetrievalQA
 from io import StringIO
 import traceback
 import openai
@@ -19,20 +25,20 @@ import streamlit as st
 import browse
 import requests
 from colorama import Fore
-import gpt4all
+import tempfile
 
 model_name = "gpt-3.5-turbo"
 st.set_page_config(page_title="Nuggt", layout="wide")
 count = 0
-openai.api_key = "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"
-os.environ["OPENAI_API_KEY"] = "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"
+openai.api_key = "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"
+os.environ["OPENAI_API_KEY"] = "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"
 os.environ["SERPER_API_KEY"] = "9cae0f9d724d3cb2e51211d8e49dfbdc22ab279b"
 os.environ["SCENEX_API_KEY"] = "f7GcmHvrJY050vmMn85L:1b7202dcbd71af619f044f87fc6721c5233c24e3cd64e2ee9c9ff69e29647024"
 os.environ["GOOGLE_API_KEY"] = "AIzaSyBq3rhqM03-hqLbDqHeKHbc8K2qSgqMW7Q"
 os.environ["GOOGLE_CSE_ID"] = "a60ee944812a441d9"
 
 search_api = GoogleSerperAPIWrapper()
-
+global tmp_path
 def save_to_sheets(userInput, outputFormat, feedback, logs):
     url = "https://docs.google.com/forms/d/1PveqD5klH2geQvI3nlkI6l-chBctNz6O-jmpwSO2FYk/formResponse"
 
@@ -89,17 +95,9 @@ def extract_code_from_block(text):
 
 def google(query):
     search = GoogleSearchAPIWrapper()
-    return str(search.results(query.replace('"', ''), 5))
-    """answer = []
-    for result in search.results(query, 2):
-        bw_input = {"url": result["link"], "information": query}
-        print(browse_website(str(bw_input).replace("'", '"')))
-        answer.append({"information": browse_website(str(bw_input).replace("'", '"')), "source": result["link"]})
-    
-    return str(answer)"""
+    return str(search.results(query.replace('"', ''), 3))
 
 def browse_website(query):
-    """Browse a website and return the summary and links"""
     data = json.loads(query)
     text = browse.scrape_text(data["url"])
     embeddings = OpenAIEmbeddings()
@@ -133,6 +131,50 @@ def video_tool(query):
     chain = load_qa_chain(OpenAI(), chain_type="stuff")
     return chain.run(input_documents=docs, question=query)
 
+def document_tool(query):
+    data = json.loads(query)
+    
+    loader = PyMuPDFLoader(tmp_path)
+    pages = loader.load_and_split()
+    faiss_index = FAISS.from_documents(pages, OpenAIEmbeddings())
+    retriever = faiss_index.as_retriever(search_type="similarity", search_kwargs={"k":2})
+    rqa = RetrievalQA.from_chain_type(llm=OpenAI(), 
+                                chain_type="stuff", 
+                                retriever=retriever, 
+                                return_source_documents=True,
+                                )
+    return str(rqa(data["information"]))
+    
+    
+    docs = faiss_index.similarity_search(data["information"], k=3)
+    llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
+    chain = load_qa_chain(llm, chain_type="stuff")
+    return chain.run(input_documents=docs, question=data["information"])
+    content = ""
+    for doc in docs:
+        content = content + str(doc.metadata["page"]) + ":" + doc.page_content[:300] + "\n"
+    return content
+    """transcript = PdfReader(tmp_path)
+    raw_text = ""
+    for i, page in enumerate(transcript.pages):
+        text = page.extract_text()
+        if text:
+            raw_text += text
+    
+    text_splitter = RecursiveCharacterTextSplitter(        
+        #separator = "\n",
+        chunk_size = 1000,
+        chunk_overlap  = 10,
+        #length_function = len,
+    )
+    texts = text_splitter.split_text(raw_text)
+    embeddings = OpenAIEmbeddings()
+    docsearch = FAISS.from_texts(texts, embeddings)
+    llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
+    docs = docsearch.similarity_search(data["information"])
+    chain = load_qa_chain(llm, chain_type="stuff")
+    return chain.run(input_documents=docs, question=data["information"])"""
+
 def python(code):
     code = extract_code_from_block(code)
     result = python_repl.run(code) 
@@ -153,7 +195,6 @@ def fix_error(code, result):
         print(Fore.RED + "Code needs some correction.")
         messages = [
         {"role": "user", "content": f"""Output the corrected code in the following format:\n```Your code here```\n{user_input}"""},
-        #{"role": "user", "content": user_input}
         ]
 
         response = openai.ChatCompletion.create(
@@ -203,7 +244,6 @@ def custom_llm(query):
 
 def stable_diffusion(query):
     prompt = StableDiffusionPromptGeneratorTool().langchain.run(query)
-    #return StableDiffusionTool().langchain.run(query)
     return StableDiffusionTool().run(prompt)
 
 def image_caption(path):
@@ -217,7 +257,7 @@ def human(query):
 
 def get_tool_info(tool_name):
     tools = {
-        "python": {"type": "tool", "name": "python", "use": "Use this to execute python code. Display your results using the print function.", "input": "Input should be a valid python code. Ensure proper indentation", "function": python},
+        "python": {"type": "tool", "name": "python", "use": "Use this to execute python code. Display your results using the print funçction.", "input": "Input should be a valid python code. Ensure proper indentation", "function": python},
         "search": {"type": "tool", "name": "search", "use": "Use this tool to get information from the internet", "input": "Input should be the query you want to search", "function": search},
         "video_tool": {"type": "tool", "name": "video_tool", "use": "useful when you want to retrieve information from a video", "input": "The input should be a JSON of the following format:\n{\"video_url\": \"URL of the video\", \"information\": \"the information you want to retrieve from the video\"}", "function": video_tool},
         "llm": {"type": "tool", "name": "llm", "use": "useful to get answer from an llm model", "input": "The input should be in the following format:\n{\"prompt\": \"The prompt to initialise the LLM\", \"input\": \"The input to the LLM\"}", "function": custom_llm},
@@ -227,7 +267,8 @@ def get_tool_info(tool_name):
         "display" : {"type": "tool", "name": "display", "use": "Use this to display things using streamlit", "input": "The input should be a valid python code using the streamlit library", "function": display},
         "human": {"type": "tool", "name": "human", "use": "Use this to get input from the user", "input": "The input should be the information you want from the user.", "function": human},
         "browse_website": {"type": "tool", "name": "browse_website", "use": "Use this to get information from a website", "input": "The input should be in the following format:\n{\"url\": \"URL of the website\", \"information\": \"the information you want to retrieve from the website\"}", "function": browse_website},
-        "google": {"type": "tool", "name": "google", "use": "use it to get google results", "input": "The input should be a google query", "function": google}
+        "google": {"type": "tool", "name": "google", "use": "use it to get google results", "input": "The input should be a google query", "function": google},
+        "document_tool": {"type": "tool", "name": "document_tool", "use": "useful when you want to retrieve information from a document", "input": "The input should be a JSON of the following format:\n{\"document_name\": \"name of the document you want to retrieve information from\", \"information\": \"the information you want to retrieve from the document\"}", "function": document_tool},
         }
     return tools[tool_name]
 
@@ -235,15 +276,15 @@ def nuggt(user_input, output_format, variables):
     tools = []
     tools_description = "\n\nYou can use the following actions:\n\n" 
     value_dict = {}
+    uploaded_file = None
     form_user = st.form("user-form")
-    output_type = ""
     for variable in variables:
         type = variable.split(":")[0]
         choice = variable.split(":")[1]
         if type == "text":
             if choice not in value_dict.keys():
                 temp = form_user.text_input(f"Enter value for {choice}: ")
-                #Check if text input is a file to be created
+
                 if (is_file(temp)):
                     new_file_path = os.path.join(os.getcwd(), temp)
                     print(new_file_path)
@@ -262,6 +303,13 @@ def nuggt(user_input, output_format, variables):
                 if uploaded_file:
                     user_input = user_input.replace(replace_string, "<" + uploaded_file.name + ">")
                     value_dict[choice] = uploaded_file.name
+                    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+                        global tmp_path
+                        tmp.write(uploaded_file.getvalue())
+                        tmp_path = tmp.name
+                    with open(os.path.join("",uploaded_file.name),"wb") as f:
+                        f.write(uploaded_file.getbuffer())
+                        
             else:
                 replace_string = "{" + variable + "}"
                 user_input = user_input.replace(replace_string, "<" + value_dict[choice] + ">")
@@ -275,16 +323,6 @@ def nuggt(user_input, output_format, variables):
                 tools_description = tools_description + "Action Name: " + tool_info["name"] + "\nWhen To Use: " + tool_info["use"] + "\nInput: " + tool_info["input"]
                 tools_description = tools_description + "\n\n"
                 value_dict[choice] = tool_info["function"]
-    
-    agent_instruction = f"""\nUse the following format:
-        Thought: you should always think about what to do
-        Action: the action to take, should be one of {tools}.
-        Action Input: the input to the action
-        Observation: the result of the action
-        ... (this Thought/Action/Action Input/Observation can repeat N times)
-        Thought: I now know the final answer
-        Final Answer: {output_format}
-        """
     
     agent_instruction = f"""\nUse the following format:
         Step 1: The first step
@@ -305,13 +343,16 @@ def nuggt(user_input, output_format, variables):
         Final Answer: {output_format}
         """
     nuggt = user_input + tools_description + agent_instruction
-    print(nuggt)
     submit = form_user.form_submit_button("Submit")
     if submit:
-        agent = st.write(initialise_agent(nuggt, value_dict, tools))
+        with st.spinner('I am still working on it....'):
+            agent = st.write(initialise_agent(nuggt, value_dict, tools))
         save_to_sheets("-", "-", "-", agent)
         feedback = st.text_input("Thank you for experimenting with Nuggt! We would appreciate some feedback to help improve the product :smiley:")
         save_to_sheets("-", "-", feedback, "-")
+        if uploaded_file:
+            os.remove(uploaded_file.name)
+        #st.write("All uploaded files have been deleted")
 
         
 def initialise_agent(nuggt, value_dict, tools):   
@@ -319,8 +360,6 @@ def initialise_agent(nuggt, value_dict, tools):
     output = ""
     log_expander = st.expander('Logs')  # create expander
     while(True):
-        #print(Fore.RED + "agent called")
-        
         response = openai.ChatCompletion.create(
             model=model_name,
             messages=messages,
@@ -331,38 +370,40 @@ def initialise_agent(nuggt, value_dict, tools):
         output = response.choices[0].message["content"]
         output = output.replace("Observation:", "")
         print(Fore.BLUE + output)
+
         with log_expander:  # write to expander
-            st.write(output + "\n")
+            st.write(output.split("Reason:")[0] + "\n")
+
         regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
         match = re.search(regex, output, re.DOTALL)
+
         if "Final Answer:" in output and not match:
-            #print(Fore.YELLOW + output)
-            return output.split("Final Answer: ")[1]
-        elif "Final Answer:" in output and match:
-            #output = "Your output should have only one pair of Thought/Action/Action Input. Not more than that."
-            print(Fore.YELLOW + "The model's output was shortened")
-            output = output.split("Thought")[0]
-            
-        #regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
-        #match = re.search(regex, output, re.DOTALL)
+            return output.split("Final Answer:")[1]
+            #return output.replace("Final Answer:", "")
+        
+        if output.count("Action:") > 1:
+            print(Fore.YELLOW + "The model went crazy.")
+            output = "Please go one step at a time."
+            messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
+            continue
+
         if not match:
             print(Fore.RED + "The model was sidetracked.")
-            #print(output)
             output = "You are not following the format. Please follow the given format."
             messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
             continue
-        #raise ValueError(f"Could not parse LLM output: `{output}`")
+       
         action = match.group(1).strip()
         if action not in tools:
             output = f"Invalid Action. Your action should be one of {tools}."
             print(Fore.YELLOW + "The agent forgot his tools." + output) 
             messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
             continue
+
         action_input = match.group(2)
         observation = value_dict[action](action_input)
         print(Fore.GREEN + "\nObservation: " + observation)
-        output = output + "\nObservation: " + observation #+ "\nThought: "
-        #print(output)
+        output = output + "\nObservation: " + observation 
         messages = [{"role": "user", "content": messages[0]["content"] + "\n" + output}]
 
 def get_most_recent_file(dir_path):
@@ -381,6 +422,37 @@ def main():
     st.title('Nuggt.io')
 
     col1, col2 = st.columns([2, 3], gap="large")
+    
+    with st.sidebar:
+        selected = option_menu(
+            menu_title = "Choose an app",
+            options = ["Search", "Data", "Document"],
+        )
+    
+    if selected == "Search":
+
+        user_input = """Step: Find websites related to {text:query} using {tool:google}.
+        Step: Browse the results to gather information using {tool:browse_website}.
+        Step: Based on the gathered information answer {text:query}"""
+
+       # user_input = """Step: Research on {text:input} using {tool:google}
+       # Step: From the results, browse 5 websites to get more information using {tool:browse_website}"""
+        output_format = "For each source output the following:\nContent: The relevant information you found in that website\nSource: The link of that website"
+
+    if selected == "Data":
+        user_input = """Step: Open {upload:file} using {tool:python}
+        Step: Display its description using {tool:python}
+        Step: Complete the task {text:input} using {tool:python}
+        Step: Display your results using {tool:display}
+        """
+        output_format = "ack"
+
+    if selected == "Document":
+        user_input = """Step: Answer {text:query} by retrieving information from {upload:file} using {tool:document_tool}. 
+        """
+
+        output_format = "Answer: Answer to the original query\nSource: The most relevant source in the document\nPage Number: The page number of the most relevant source."
+
 
     with col1:
         st.subheader("How to use")
@@ -428,26 +500,13 @@ def main():
         """)
 
     with col2:
-        user_input = st.text_area("Enter your instruction: ", key="enter_instruction")
-        output_format = st.text_input("Enter output format: ", key="output")
+        #user_input = st.text_area("Enter your instruction: ", key="enter_instruction")
+        #output_format = st.text_input("Enter output format: ", key="output")
 
         if user_input and output_format:
             save_to_sheets(user_input, output_format, "-", "-")
             variables = extract_variables(user_input)
             nuggt(user_input, output_format, variables)
-
-            # """most_recent_file = get_most_recent_file("path_to_your_repo")
-
-            # # Provide a download button for the file
-            # with open(most_recent_file, "rb") as file:
-            #     file_content = file.read()
-
-            # st.download_button(
-            #     label="Download file",
-            #     data=file_content,
-            #     file_name=os.path.basename(most_recent_file),
-            #     mime="application/octet-stream",
-            # )"""
 
         
 if __name__ == "__main__":
