@@ -27,8 +27,9 @@ import requests
 from colorama import Fore
 import tempfile
 
-model_name = "gpt-3.5-turbo"
 st.set_page_config(page_title="Nuggt", layout="wide")
+
+model_name = "gpt-3.5-turbo"
 count = 0
 openai.api_key = "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"
 os.environ["OPENAI_API_KEY"] = "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"
@@ -445,122 +446,47 @@ def get_most_recent_file(dir_path):
     
 def main():
 
-    st.title("Nuggt.io")
-    guide = ""
-    information = ""
-    promotion = ""
-    col1, col2 = st.columns([2, 3], gap="large")
-    
-    # with st.sidebar:
-    #     selected = option_menu(
-    #         menu_title = "Choose an app",
-    #         options = ["Search", "Data", "Document","Home"],
-    #     )
-    
-    if selected == "Search":
-        guide = """Ask a question and our application would provide you answers with the relevant sources."""
-        information = """This app was created with a single AI command as follows:
-        ```Find websites related to {text:query} using {tool:google} and list the relevant sources```
-        """
-        promotion = """Nuggt allows you to create deployable AI apps with a single command. 
-        You can create an app for anything you imagine. For example, the following command would create an app that researches
-        on a given topic and creates a powerpoint presentation with the relevant sources:
-        `Gather information on {text:topic} using {tool:google} and based on the gathered information create a powerpoint presentation with the relevant sources using {tool:powerpoint}` 
-        You can create your own app at [Nuggt Playground](https://nuggt.io)
-        """
-        user_input = """Step: Find websites related to {text:query} using {tool:google}.
-        Step: Browse the results to gather information on {text:query} using {tool:browse_website}.
-        Step: Based on the gathered information answer {text:query}"""
+    st.header("Nuggt Playground")
+    user_input = st.text_input(label='Enter input here')
 
-       # user_input = """Step: Research on {text:input} using {tool:google}
-       # Step: From the results, browse 5 websites to get more information using {tool:browse_website}"""
-        output_format = "For each source output the following:\nContent: The relevant information you found in that website\nSource: The link of that website"
+    output_format = st.text_input(label='Output format')
 
-    if selected == "Data":
-        guide = """Upload an Excel/CSV file for data analysis. You can ask the app generic questions like "summarise this data" or specific questions like "What is the relationship between Column A and Column B". The app can also generate data visualisations like bargraphs, piecharts etc. You can generate visualisations by typing "Generate visualisations for.." """
-        information = """This app was created with a single AI command as follows:
-        ```Open {upload:file} using {tool:document_loader} and complete the task {text:task} using {tool:data_analysis}```
-        """
-        promotion = """Nuggt allows you to create deployable AI apps with a single command. 
-        You can create an app for anything you imagine. For example, the following command would create an app that fetches real-time data on stocks, saves it in an excel file and creates some basic visualisations for analysis.
-        ```Find information on {text:stock} using {tool:stock_tool}, save it in an excel file using {tool:excel_tool} and display some basic visualisations using {tool:data_analysis}``` 
-        You can create your own app at [Nuggt Playground](https://nuggt.io)
-        """
-        user_input = """Step: Open {upload:file} using {tool:python}
-        Step: Display its description using {tool:python}
-        Step: Complete the task {text:input} using {tool:python}
-        Step: Display your results using {tool:display}
-        """
-        output_format = "ack"
+    if user_input and output_format:
+        save_to_sheets(user_input, output_format, "-", "-")
+        variables = extract_variables(user_input)
+        nuggt(user_input, output_format, variables)
 
-    if selected == "Document":
-        guide = """Upload a PDF to retrieve information. Once you upload the PDF, you can simply type a question in the textbox to retrieve information and the relevant page number from the PDF. """
-        
-        information = """This app was created with a single AI command as follows:
-        ```Open {upload:file} using {tool:document_loader} and answer {text:query} with sources using {tool:document_chat}```
-        """
-
-        promotion = """Nuggt allows you to create deployable AI apps with a single command. 
-        You can create an app for anything you imagine. For example, the following command would create an app that retrieves data from a PDF and creates an excel sheet for it.
-        ```Open {upload:file} using {tool:document_loader}, fetch data for {text:query} and organise it in an excel file using {tool:excel_tool}``` 
-        You can create your own app at [Nuggt Playground](https://nuggt.io)
-        """
-
-        user_input = """Step: Answer {text:query} by retrieving information from {upload:file} using {tool:document_tool}. 
-        """
-
-        output_format = "Answer: Answer to the original query\nSource: The most relevant source in the document\nPage Number: The page number of the most relevant source."
-
-    if selected in ["Search", "Data", "Document"]:
-        with col1:
+        # with st.form(key='my_form'):
+        #     st.write('Please enter your information:')
             
-                st.subheader("How To Use")
-                st.markdown(guide)
-                st.subheader("How Was This Created?")
-                st.markdown(information)
-                st.subheader("Create Your Own App at [Nuggt Playground](https://nuggt.io)")
-                st.markdown(promotion)
-                
-        with col2:
-            #user_input = st.text_area("Enter your instruction: ", key="enter_instruction")
-            #output_format = st.text_input("Enter output format: ", key="output")
+        #     # Full Name
+        #     full_name = st.text_input(label='Full Name')
 
-            if user_input and output_format:
-                save_to_sheets(user_input, output_format, "-", "-")
-                variables = extract_variables(user_input)
-                nuggt(user_input, output_format, variables)
-    else:
-        with st.form(key='my_form'):
-            st.write('Please enter your information:')
+        #     # Email
+        #     email = st.text_input(label='Email')
             
-            # Full Name
-            full_name = st.text_input(label='Full Name')
+        #     # Gender
+        #     gender = st.selectbox('Gender', options=['Male', 'Female'])
 
-            # Email
-            email = st.text_input(label='Email')
-            
-            # Gender
-            gender = st.selectbox('Gender', options=['Male', 'Female'])
+        #     # Date of Birth
+        #     dob = st.date_input('Date of Birth')
 
-            # Date of Birth
-            dob = st.date_input('Date of Birth')
+        #     # How do you plan to use nuggt?
+        #     use_plan = st.text_area('How do you plan to use nuggt?')
 
-            # How do you plan to use nuggt?
-            use_plan = st.text_area('How do you plan to use nuggt?')
+        #     # Do you know how to get an OpenAI API Key?
+        #     openai_key_knowledge = st.radio("Do you know how to get an OpenAI API Key?", ('Yes', 'No'))
 
-            # Do you know how to get an OpenAI API Key?
-            openai_key_knowledge = st.radio("Do you know how to get an OpenAI API Key?", ('Yes', 'No'))
+        #     # Submit button
+        #     submit_button = st.form_submit_button(label='Submit')
 
-            # Submit button
-            submit_button = st.form_submit_button(label='Submit')
-
-        # Validate email
-        if submit_button:
-            email_match = re.match(r"[^@]+@[^@]+\.[^@]+", email)
-            if email_match is None:
-                st.error('Invalid email address')
-            else:
-                st.success('Form successfully submitted.')
+        # # Validate email
+        # if submit_button:
+        #     email_match = re.match(r"[^@]+@[^@]+\.[^@]+", email)
+        #     if email_match is None:
+        #         st.error('Invalid email address')
+        #     else:
+        #         st.success('Form successfully submitted.')
 
         
 if __name__ == "__main__":
