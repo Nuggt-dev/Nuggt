@@ -1,4 +1,9 @@
 from Nuggt_Playground import *
+from sidebar_logo import sidebar_logo
+
+st.set_page_config(page_title="Data Analysis", layout="wide")
+
+sidebar_logo("nuggt-logo.png")
 
 promotion = """Nuggt allows you to create deployable AI apps with a single command. 
 You can create an app for anything you imagine. For example, the following command would create an app that fetches real-time data on stocks, saves it in an excel file and creates some basic visualisations for analysis.

@@ -26,8 +26,34 @@ import browse
 import requests
 from colorama import Fore
 import tempfile
+from sidebar_logo import sidebar_logo
+import toml
 
 st.set_page_config(page_title="Nuggt", layout="wide")
+
+# Load the configuration file
+config = toml.load("./.streamlit/config.toml")
+
+# Access the configuration options
+primary_color = config["theme"]["primaryColor"]
+secondary_background_color = config["theme"]["secondaryBackgroundColor"]
+text_color = config["theme"]["textColor"]
+
+# Apply the theme settings
+st.markdown(
+    f"""
+    <style>
+        :root {{
+            --primary-color: {primary_color};
+            --secondary-background-color: {secondary_background_color};
+            --text-color: {text_color};
+        }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+sidebar_logo("nuggt-logo.png")
 
 model_name = "gpt-3.5-turbo"
 count = 0

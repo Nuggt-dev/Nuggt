@@ -1,7 +1,10 @@
 from Nuggt_Playground import *
+from sidebar_logo import sidebar_logo
 
 st.set_page_config(page_title="Document QnA", layout="wide")
-    
+
+sidebar_logo("nuggt-logo.png")
+
 information = """This app was created with a single AI command as follows:
 ```Open {upload:file} using {tool:document_loader} and answer {text:query} with sources using {tool:document_chat}```
 """
