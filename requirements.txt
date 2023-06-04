@@ -1,7 +1,7 @@
 streamlit>=1.3.0
 PyPDF2>=1.26.0
 pypdf>=0.0.1
-langchain>=0.0.157
+langchain>=0.0.188
 openai>=0.27.0
 faiss-cpu>=1.7.1.post2
 pinecone-client>=0.0.8
@@ -13,3 +13,4 @@ gradio_tools>=0.0.9
 gspread>=5.7.2
 config>=0.5.1
 google-api-python-client>=2.86.0
+PyMuPDF>=1.22.3
