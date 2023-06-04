@@ -26,7 +26,7 @@ import browse
 import requests
 from colorama import Fore
 import tempfile
-from sidebar_logo import sidebar_logo
+from sidebar_functions import sidebar_logo, sidebar_save_api
 import toml
 
 st.set_page_config(page_title="Nuggt", layout="wide")
@@ -54,10 +54,12 @@ st.markdown(
 )
 
 sidebar_logo("nuggt-logo.png")
+sidebar_save_api()
 
 model_name = "gpt-3.5-turbo"
 count = 0
-openai.api_key = "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"
+openai.api_key = "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" #UNCOMMENT IN DEV
+# openai.api_key = st.session_state.openai_api_key #UNCOMMENT IN PROD
 os.environ["OPENAI_API_KEY"] = "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"
 os.environ["SERPER_API_KEY"] = "9cae0f9d724d3cb2e51211d8e49dfbdc22ab279b"
 os.environ["SCENEX_API_KEY"] = "f7GcmHvrJY050vmMn85L:1b7202dcbd71af619f044f87fc6721c5233c24e3cd64e2ee9c9ff69e29647024"
