@@ -377,12 +377,14 @@ def nuggt(user_input, output_format, variables):
         with st.spinner('I am still working on it....'):
             try:
                 agent = st.write(initialise_agent(nuggt, value_dict, tools))
+                if agent:
+                    save_to_sheets("-", "-", "-", agent)
             except Exception as e:
                 st.write(e)
                 # st.write("Our servers appear to be experiencing high traffic at the moment. Given that we're currently in our Beta phase, we sincerely appreciate your patience and understanding. Please try again in a short while. Thank you for your support during this exciting stage of our development!")
-        save_to_sheets("-", "-", "-", agent)
         feedback = st.text_input("Thank you for experimenting with Nuggt! We would appreciate some feedback to help improve the product :smiley:")
-        save_to_sheets("-", "-", feedback, "-")
+        if feedback:
+            save_to_sheets("-", "-", feedback, "-")
         if uploaded_file:
             os.remove(uploaded_file.name)
         #st.write("All uploaded files have been deleted")
@@ -476,7 +478,7 @@ def get_most_recent_file(dir_path):
 def main():
 
     st.header("Nuggt Playground")
-    user_input = st.text_input(label='Enter input here')
+    user_input = st.text_area(label='Enter input here')
 
     output_format = st.text_input(label='Output format')
 
