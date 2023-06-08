@@ -58,7 +58,7 @@ def video_tool(query):
 def document_tool(query):
     data = json.loads(query)
     
-    loader = PyMuPDFLoader(tmp_path)
+    loader = PyMuPDFLoader(data["document_name"])
     pages = loader.load_and_split()
     faiss_index = FAISS.from_documents(pages, OpenAIEmbeddings())
     retriever = faiss_index.as_retriever(search_type="similarity", search_kwargs={"k":2})

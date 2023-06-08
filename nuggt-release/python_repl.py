@@ -67,7 +67,7 @@ def fix_error(code, result):
         )
 
         code = response.choices[0].message["content"].strip()
-        code = code.replace("`", "")
+        code = extract_code_from_block(code)
         print(f"\nOutput of the model: {code}")
 
         result = python_repl.run(code)
@@ -78,6 +78,8 @@ def fix_error(code, result):
 
 def python(code):
     code = extract_code_from_block(code)
+    if code == "The package is successfully installed.":
+        return code
     result = python_repl.run(code) 
     if "Your code has the following error." in result:
         result = fix_error(code, result)
@@ -85,4 +87,4 @@ def python(code):
     if result == "":
         result = "Your code was successfully executed."
 
-    return result  
+    return result 
