@@ -26,7 +26,7 @@ import browse
 import requests
 from colorama import Fore
 import tempfile
-from sidebar_functions import sidebar_logo, sidebar_save_api
+from sidebar_functions import sidebar_logo
 import toml
 
 st.set_page_config(page_title="Nuggt", layout="wide")
@@ -54,7 +54,6 @@ st.markdown(
 )
 
 sidebar_logo("nuggt-logo.png")
-sidebar_save_api()
 
 model_name = "gpt-3.5-turbo"
 count = 0

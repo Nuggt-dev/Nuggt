@@ -36,13 +36,3 @@ def sidebar_logo(png_file):
         logo_markup,
         unsafe_allow_html=True,
     )
-
-def sidebar_save_api():
-    key = st.session_state.openai_api_key if "openai_api_key" in st.session_state else "" 
-    openai_api_key = st.sidebar.text_input("OpenAI API Key", value=key, type="password")
-    st.sidebar.caption("*Required for all apps; get it [here](https://platform.openai.com/account/api-keys).*")
-    if st.sidebar.button("Save"):
-        if not openai_api_key.strip():
-            st.sidebar.error("Please provide the missing API key.")
-        else:
-            st.session_state.openai_api_key = openai_api_key
