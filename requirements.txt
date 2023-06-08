@@ -14,3 +14,4 @@ gspread>=5.7.2
 config>=0.5.1
 google-api-python-client>=2.86.0
 PyMuPDF>=1.22.3
+python-dotenv>=1.0.0

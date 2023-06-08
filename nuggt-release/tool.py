@@ -15,10 +15,12 @@ import openai
 import browse
 import json
 import os 
+import streamlit as st
 
 load_dotenv()
-model_name = os.getenv("MODEL_NAME")
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+model_name = os.getenv("MODEL_NAME") or st.session_state.model_name
+openai_api_key = os.environ.get("OPENAI_API_KEY") or st.session_state.openai_api_key
 
 def google(query):
     search = GoogleSearchAPIWrapper()
