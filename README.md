@@ -32,8 +32,8 @@ streamlit run Nuggt_Playground.py
 ```
 
 ## Important Docs
-* [Documentation][docs/documentation.md]
-* [Contribution Guidelines][docs/contribution_guidelines.md]
+* [Documentation](docs/documentation.md)
+* [Contribution Guidelines](docs/contribution_guidelines.md)
 
 ## Limitations
 
