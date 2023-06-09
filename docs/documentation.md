@@ -104,7 +104,7 @@ We welcome contributions from the community! If you would like to contribute to 
 
 ## Support
 
-If you encounter any issues or have questions regarding Nuggt, please feel free to reach out to our support team at {discord}. We are here to assist you and ensure a smooth experience with Nuggt.
+If you encounter any issues or have questions regarding Nuggt, please feel free to reach out to our support team at [Discord Server](https://discord.gg/gzdCDM84). We are here to assist you and ensure a smooth experience with Nuggt.
 
 Thank you for choosing Nuggt. Happy automating!
 
