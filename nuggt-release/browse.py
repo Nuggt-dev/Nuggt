@@ -1,3 +1,5 @@
+#This file is taken from https://github.com/Significant-Gravitas/Auto-GPT
+
 import requests
 from bs4 import BeautifulSoup
 
