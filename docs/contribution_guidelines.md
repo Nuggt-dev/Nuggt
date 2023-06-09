@@ -43,6 +43,6 @@ Thank you for considering contributing to Nuggt! Your contributions play a vital
 
 ## Support
 
-If you need any assistance or have any questions about contributing, please don't hesitate to reach out to our support team at {discord}.
+If you need any assistance or have any questions about contributing, please don't hesitate to reach out to our support team at [Discord Server](https://discord.gg/gzdCDM84).
 
 We appreciate your contributions and look forward to collaborating with you!
