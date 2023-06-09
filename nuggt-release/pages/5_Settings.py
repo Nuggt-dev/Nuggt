@@ -1,7 +1,6 @@
 from Nuggt_Playground import *
 from helper.sidebar_functions import sidebar_logo
-
-st.set_page_config(page_title="Settings", layout="wide")
+import os
 
 sidebar_logo("assets/nuggt-logo.png")
 
@@ -37,7 +36,7 @@ with col2:
 
 if st.button("Save"):
     keys = [
-        ("Model Name", language_model_name, "language_model_name"),
+        ("Model Name", language_model_name, "model_name"),
         ("OpenAI API Key", openai_api_key, "openai_api_key"),
         ("Serper API Key", serper_api_key, "serper_api_key"),
         ("Scenex API Key", scenex_api_key, "scenex_api_key"),
@@ -45,7 +44,11 @@ if st.button("Save"):
         ("Google CSE Key", google_cse_api_key, "google_cse_api_key")
     ]
 
-    missing_keys = [name for name, value, _ in keys if not value.strip()]
+    required_keys = [
+        ("OpenAI API Key", openai_api_key, "openai_api_key")
+    ]
+
+    missing_keys = [name for name, value, _ in required_keys if not value.strip()]
     
     if missing_keys:
         for key in missing_keys:
@@ -53,6 +56,13 @@ if st.button("Save"):
     else:
         for _, value, state_key in keys:
             st.session_state[state_key] = value
+            os.environ["OPENAI_API_KEY"]=openai_api_key
+            os.environ["SERPER_API_KEY"]=serper_api_key
+            os.environ["SCENEX_API_KEY"]=scenex_api_key
+            os.environ["GOOGLE_API_KEY"]=google_api_key
+            os.environ["GOOGLE_CSE_ID"]=google_cse_api_key
+            os.environ["MODEL_NAME"]=language_model_name
+
         st.success("API keys saved successfully.")
 
 

@@ -1,16 +1,9 @@
-from dotenv import load_dotenv
 from colorama import Fore
 from io import StringIO
 import traceback
 import openai
 import sys
 import os
-import streamlit as st
-
-load_dotenv()
-
-model_name = os.getenv("MODEL_NAME") or st.session_state.model_name
-openai_api_key = os.environ.get("OPENAI_API_KEY") or st.session_state.openai_api_key
 
 class PythonREPL:
     def __init__(self):
@@ -61,7 +54,8 @@ def fix_error(code, result):
         ]
 
         response = openai.ChatCompletion.create(
-                model=model_name,
+                api_key=os.getenv("OPENAI_API_KEY"),
+                model=os.getenv("MODEL_NAME"),
                 messages=messages,
                 temperature=0, 
         )

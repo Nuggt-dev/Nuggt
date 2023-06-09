@@ -1,9 +1,8 @@
-from streamlit_option_menu import option_menu
+import streamlit as st
 import openai
 import re
 import os
 import glob
-import streamlit as st
 import requests
 from colorama import Fore
 import tempfile
@@ -13,8 +12,7 @@ import toml
 import tool
 import openai
 
-st.set_page_config(page_title="Nuggt", layout="wide")
-
+load_dotenv()
 config = toml.load("./.streamlit/config.toml")
 
 primary_color = config["theme"]["primaryColor"]
@@ -36,12 +34,8 @@ st.markdown(
 
 sidebar_logo("assets/nuggt-logo.png")
 
-load_dotenv()
 count = 0
 global tmp_path
-
-model_name = os.getenv("MODEL_NAME") or st.session_state.model_name
-openai.api_key = os.environ.get("OPENAI_API_KEY") or st.session_state.openai_api_key
 
 def save_to_sheets(userInput, outputFormat, feedback, logs):
     url = "https://docs.google.com/forms/d/1PveqD5klH2geQvI3nlkI6l-chBctNz6O-jmpwSO2FYk/formResponse"
@@ -179,7 +173,8 @@ def initialise_agent(nuggt, value_dict, tools):
             raise ValueError("Too many steps")
         
         response = openai.ChatCompletion.create(
-            model=model_name,
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            model=os.getenv("MODEL_NAME"),
             messages=messages,
             temperature=0, 
             top_p=0,
@@ -251,11 +246,8 @@ def get_most_recent_file(dir_path):
     most_recent_file = max(files, key=os.path.getctime)
 
     return most_recent_file
-
-
     
 def main():
-
     st.header("Nuggt Playground")
     user_input = st.text_area(label='Enter instruction here')
 

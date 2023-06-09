@@ -9,18 +9,11 @@ from langchain.tools import SceneXplainTool
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import FAISS
 from langchain.llms import OpenAI
-from dotenv import load_dotenv
 import python_repl
 import openai
 import browse
 import json
 import os 
-import streamlit as st
-
-load_dotenv()
-
-model_name = os.getenv("MODEL_NAME") or st.session_state.model_name
-openai_api_key = os.environ.get("OPENAI_API_KEY") or st.session_state.openai_api_key
 
 def google(query):
     search = GoogleSearchAPIWrapper()
@@ -57,7 +50,6 @@ def video_tool(query):
 
 def document_tool(query):
     data = json.loads(query)
-    
     loader = PyMuPDFLoader(data["document_name"])
     pages = loader.load_and_split()
     faiss_index = FAISS.from_documents(pages, OpenAIEmbeddings())
@@ -86,7 +78,8 @@ def custom_llm(query):
         {"role": "user", "content": data["input"]}
     ]
     response = openai.ChatCompletion.create(
-            model=model_name,
+            api_key=os.environ.get("OPENAI_API_KEY"),
+            model=os.getenv("MODEL_NAME"),
             messages=messages,
             temperature=0, 
     )

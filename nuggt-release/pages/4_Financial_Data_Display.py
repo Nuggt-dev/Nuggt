@@ -1,8 +1,6 @@
 from Nuggt_Playground import *
 from helper.sidebar_functions import sidebar_logo
 
-st.set_page_config(page_title="Financial Data Display", layout="wide")
-
 sidebar_logo("assets/nuggt-logo.png")
 
 st.subheader("Financial Data Display")
