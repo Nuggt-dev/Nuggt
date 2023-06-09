@@ -31,14 +31,9 @@ cd nuggt-release
 streamlit run Nuggt_Playground.py
 ```
 
-## Documentation
-* [⚙️ Setup][docs/setup]
-* [💻 Usage][docs/usage]
-
-[docs/setup]: (https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUVbmV2ZXIgZ29ubmEgZ2l2ZSB1IHVw&ab_channel=RickAstley)
-[docs/usage]: (https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUVbmV2ZXIgZ29ubmEgZ2l2ZSB1IHVw&ab_channel=RickAstley)
-[docs/plugins]: (https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUVbmV2ZXIgZ29ubmEgZ2l2ZSB1IHVw&ab_channel=RickAstley)
-
+## Important Docs
+* [Documentation][docs/documentation.md]
+* [Contribution Guidelines][docs/contribution_guidelines.md]
 
 ## Limitations
 
