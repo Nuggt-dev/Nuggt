@@ -73,11 +73,34 @@ By utilizing the `{tool:<tool_name>}` input format, you can seamlessly integrate
 
 ## Examples
 
-Check out the examples directory in the Nuggt repository for detailed usage examples. These examples cover a variety of tasks and demonstrate how to structure your prompts for efficient automation.
+These examples cover a variety of tasks and demonstrate how to structure your prompts for efficient automation.
+
+### Example 1: Website Search and Information Gathering
+
+Prompt: `Find websites related to {text:query} using {tool:google}. Browse three results to gather information on {text:query} using {tool:browse_website}. Display the results in the format <Content: Content of the website, URL: URL of the website> using {tool:display}.`
+
+Description:
+This example demonstrates how to use Nuggt to search for websites related to a specific query using Google. Then browse three search results, gather information from those websites using the browse_website tool, and display the results in a specific format using the display tool.
+
+### Example 2: File Analysis and Task Completion
+
+Prompt: `Open {upload:file} using {tool:python}. Display its description using {tool:python}. Complete the task {text:input} using {tool:python}. Display your results using {tool:data_analysis}.`
+
+Description:
+In this example, you'll learn how to analyze a file using Nuggt. First, you open the specified file using the python tool, then display its description using the same tool. Next, you complete a task like "Create basic visualisations" using the python tool, and finally display the results using the data_analysis tool.
+
+### Example 3: Stock Data Analysis
+
+Prompt: `Get past 7 days OHLC data for stock {text:stock} using {tool:python}. Calculate the MACD using {tool:python} (Do not use talib). Display the results in a table using {tool:display}. Display basic visualizations using {tool:display}.`
+
+Description:
+This example focuses on stock data analysis with Nuggt. First, you retrieve the past 7 days' OHLC (Open, High, Low, Close) data for a specific stock using the python tool. Then, calculate the MACD (Moving Average Convergence Divergence) without using talib library, using the python tool. Display the results in a table format using the display tool, and also showcase basic visualizations using the same display tool.
+
+Feel free to adapt and explore these examples based on your specific use cases and requirements.
 
 ## Contributing
 
-We welcome contributions from the community! If you would like to contribute to Nuggt, please refer to the [contributing guidelines](link_to_contributing_guidelines) for more information on how to get involved.
+We welcome contributions from the community! If you would like to contribute to Nuggt, please refer to the [contributing guidelines](contribution_guidelines.md) for more information on how to get involved.
 
 ## Support
 
