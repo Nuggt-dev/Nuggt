@@ -22,16 +22,14 @@ Join us on this exciting journey of task automation with Nuggt, as we push the b
 
 
 ## Quickstart
+You can setup the API keys either under `.env` file or set it up under settings after launching the app.
 
-0. Check out the [wiki](https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUVbmV2ZXIgZ29ubmEgZ2l2ZSB1IHVw&ab_channel=RickAstley)
-1. Get an OpenAI [API Key](https://platform.openai.com/account/api-keys)
-2. Download the [latest release](https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUVbmV2ZXIgZ29ubmEgZ2l2ZSB1IHVw&ab_channel=RickAstley)
-3. Follow the [installation instructions](https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUVbmV2ZXIgZ29ubmEgZ2l2ZSB1IHVw&ab_channel=RickAstley)
-5. [Run](https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUVbmV2ZXIgZ29ubmEgZ2l2ZSB1IHVw&ab_channel=RickAstley) the app
-
-Please see the [documentation](https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUVbmV2ZXIgZ29ubmEgZ2l2ZSB1IHVw&ab_channel=RickAstley) for full setup instructions and configuration options.
-
-[docs]: https://docs.agpt.co/
+```bash
+git clone https://github.com/Nuggt-dev/Nuggt.git
+pip install -r requirements.txt
+cd nuggt-release
+streamlit run Nuggt_Playground.py
+```
 
 ## Documentation
 * [⚙️ Setup][docs/setup]
