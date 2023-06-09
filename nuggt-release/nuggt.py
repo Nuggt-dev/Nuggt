@@ -154,7 +154,7 @@ def nuggt(user_input, output_format, variables):
                 agent = st.write(initialise_agent(nuggt, value_dict, tools))
             except Exception as e:
                 print(e)
-                st.write("Our servers appear to be experiencing high traffic at the moment. Given that we're currently in our Beta phase, we sincerely appreciate your patience and understanding. Please try again in a short while. Thank you for your support during this exciting stage of our development!")
+                st.write("Oops, something went wrong. Please make sure you have entered the correct API keys. If the issue still persists, please reach out to us at https://discord.gg/gzdCDM84")
         save_to_sheets("-", "-", "-", agent)
         feedback = st.text_input("Thank you for experimenting with Nuggt! We would appreciate some feedback to help improve the product :smiley:")
         save_to_sheets("-", "-", feedback, "-")
