@@ -1,11 +1,11 @@
 # Nuggt: Automate any task with a single AI command. 
 [![GitHub Repo stars](https://img.shields.io/github/stars/Nuggt-Dev/nuggt?style=social)](https://github.com/Nuggt-Dev/nuggt/)
 
-Nuggt is an open-source project that enables users to create AI agents capable of automating any task. Powered by GPT-3.5 and designed for cost-effectiveness, Nuggt offers a step-by-step prompt format for precise task execution. With seamless integration of tools like Python, document processing, video analysis, Google search, and web browsing, Nuggt empowers users to build controlled autonomous bots efficiently.
+Nuggt is an open-source project that enables users to create AI agents capable of automating any task. Powered by GPT-3.5 and designed for cost-effectiveness, Nuggt offers a step-by-step prompt format for precise task execution. With seamless integration of tools like python, document processing, video analysis, google search, and web browsing, Nuggt empowers users to build controlled autonomous bots efficiently.
 
-While our current implementation leverages the power of GPT-3.5, we recognize the need for cost-effective solutions without compromising functionality. Our ongoing efforts involve exploring and harnessing the potential of smaller models like Vicuna 13b, ensuring that task automation remains accessible to a wider audience.
+While our current implementation leverages the power of GPT-3.5, we recognize the need for cost-effective solutions without compromising functionality. Our ongoing efforts involve exploring and harnessing the potential of smaller models like Vicuna 13B, ensuring that task automation remains accessible to a wider audience.
 
-Join us on this exciting journey of task automation with Nuggt, as we push the boundaries of what can be achieved with smaller open-source large language models, one step at a time.
+Join us on this exciting journey of task automation with Nuggt, as we push the boundaries of what can be achieved with smaller open-source large language models, one step at a time 😁.
 
 <h2 align="center"> Demo June 8th 2023 </h2>
 
@@ -13,25 +13,25 @@ https://github.com/Nuggt-dev/Nuggt/assets/52075633/f38dffd7-cec0-49a2-b18d-c4759
 
 ## Features
 
-- 🗃️ Create simple functionalities using a single set of instructions.
-- 🧠 GPT-3.5-turbo instance for cheap, accurate responses powered by prompt engineering.
+- 🗃️ All-in-one platform: Create any functionality using a single set of instructions.
+- 🧠 GPT-3.5-turbo: For cheap, accurate, and fast responses powered by prompt engineering.
 - 🔗 Build Controlled Bots: Develop controlled autonomous bots capable of automating tasks efficiently.
 - 🌐 Tool Integration: Enjoy seamless integration with various tools, including Python, document processing, video analysis, Google search, and web browsing.
 - 🚀 Community-Driven: Participate in a vibrant community, contributing feedback, suggestions, and improvements to shape the project's development.
 
 
 ## Quickstart
-You can setup the API keys either under `.env` file or set it up under settings after launching the app.
+You can setup the API keys either under `.env` file or set it up under settings tab directly on the Nuggt platform.
 
 ```bash
 git clone https://github.com/Nuggt-dev/Nuggt.git
 pip install -r requirements.txt
 cd nuggt-release
-streamlit run Nuggt_Playground.py
+streamlit run nuggt.py
 ```
 
-## Important Docs
-* [Documentation](docs/documentation.md)
+## Documentation
+* [How to use Nuggt](docs/documentation.md)
 * [Contribution Guidelines](docs/contribution_guidelines.md)
 
 ## Limitations
