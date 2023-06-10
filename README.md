@@ -9,7 +9,7 @@ Join us on this exciting journey of task automation with Nuggt, as we push the b
 
 <h2 align="center"> Demo June 8th 2023 </h2>
 
-https://github.com/Nuggt-dev/Nuggt/assets/52075633/f38dffd7-cec0-49a2-b18d-c4759fd0cf5d
+https://github.com/Nuggt-dev/Nuggt/assets/52075633/00e7c82c-61fe-4f04-b589-d65b97f441ff
 
 ## Features
 
