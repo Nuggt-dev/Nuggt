@@ -155,7 +155,7 @@ def nuggt(user_input, output_format, variables):
             except Exception as e:
                 print(e)
                 st.write("Oops, something went wrong. Please make sure you have entered the correct API keys. If the issue still persists, please reach out to us at https://discord.gg/gzdCDM84")
-        save_to_sheets("-", "-", "-", agent)
+        #save_to_sheets("-", "-", "-", agent)
         feedback = st.text_input("Thank you for experimenting with Nuggt! We would appreciate some feedback to help improve the product :smiley:")
         save_to_sheets("-", "-", feedback, "-")
         if uploaded_file:
@@ -254,7 +254,7 @@ def main():
     output_format = st.text_input(label='Output format')
 
     if user_input and output_format:
-        save_to_sheets(user_input, output_format, "-", "-")
+        #save_to_sheets(user_input, output_format, "-", "-")
         variables = extract_variables(user_input)
         nuggt(user_input, output_format, variables)
         
