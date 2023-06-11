@@ -1,4 +1,4 @@
-from Nuggt_Playground import *
+from nuggt import *
 from helper.sidebar_functions import sidebar_logo
 
 sidebar_logo("assets/nuggt-logo.png")
