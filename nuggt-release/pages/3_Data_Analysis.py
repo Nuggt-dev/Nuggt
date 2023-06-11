@@ -17,7 +17,6 @@ st.markdown("""Open **:red[{ upload : file }]** using **:green[{ tool : python }
 """)
 
 if user_input and output_format:
-    save_to_sheets(user_input, output_format, "-", "-")
     variables = extract_variables(user_input)
     nuggt(user_input, output_format, variables)
 

@@ -17,7 +17,6 @@ st.markdown("""
 """)
 
 if user_input and output_format:
-    save_to_sheets(user_input, output_format, "-", "-")
     variables = extract_variables(user_input)
     nuggt(user_input, output_format, variables)
 
