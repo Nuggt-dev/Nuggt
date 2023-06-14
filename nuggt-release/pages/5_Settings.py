@@ -1,6 +1,7 @@
 from nuggt import *
 from helper.sidebar_functions import sidebar_logo
 import os
+import streamlit as st
 
 sidebar_logo("assets/nuggt-logo.png")
 
@@ -56,12 +57,19 @@ if st.button("Save"):
     else:
         for _, value, state_key in keys:
             st.session_state[state_key] = value
-            os.environ["OPENAI_API_KEY"]=openai_api_key
-            os.environ["SERPER_API_KEY"]=serper_api_key
-            os.environ["SCENEX_API_KEY"]=scenex_api_key
-            os.environ["GOOGLE_API_KEY"]=google_api_key
-            os.environ["GOOGLE_CSE_ID"]=google_cse_api_key
-            os.environ["MODEL_NAME"]=language_model_name
+
+            if openai_api_key != "":
+                os.environ["OPENAI_API_KEY"] = openai_api_key
+            if serper_api_key != "":
+                os.environ["SERPER_API_KEY"]=serper_api_key
+            if scenex_api_key != "":
+                os.environ["SCENEX_API_KEY"]=scenex_api_key
+            if google_api_key != "":
+                os.environ["GOOGLE_API_KEY"]=google_api_key
+            if google_cse_api_key != "":
+                os.environ["GOOGLE_CSE_ID"]=google_cse_api_key
+            if language_model_name != "":
+                os.environ["MODEL_NAME"]=language_model_name
 
         st.success("API keys saved successfully.")
 
