@@ -9,9 +9,9 @@ While our current implementation leverages the power of GPT-3.5, we recognize th
 
 Join us on this exciting journey of task automation with Nuggt, as we push the boundaries of what can be achieved with smaller open-source large language models, one step at a time 😁.
 
-<h2 align="center"> Demo June 8th 2023 </h2>
+<h2 align="center"> Demo: Creating a snake game </h2>
 
-https://github.com/Nuggt-dev/Nuggt/assets/52075633/00e7c82c-61fe-4f04-b589-d65b97f441ff
+https://github.com/Nuggt-dev/Nuggt/assets/52075633/de6e081e-d263-4092-bf30-4dd857af3527
 
 ## Features
 
