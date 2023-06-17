@@ -63,5 +63,5 @@ By using this project, you acknowledge and agree to the above disclaimer.
 
 ## Connect with Us
 
-- Join our community at [Discord Server](https://discord.gg/y7W2zGn9)
+- Join our community at [Discord Server](https://discord.gg/2MF2CDhw)
 - Follow us on [Twitter](https://twitter.com/OfficialNuggt)
