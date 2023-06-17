@@ -25,9 +25,10 @@ Follow these steps to contribute code through a pull request:
 3. Create a new branch for your changes: `git checkout -b my-branch`.
 4. Make your desired changes or additions to the codebase.
 5. Test your changes to ensure they work as intended.
-6. Commit your changes: `git commit -m "Add feature or fix"`.
-7. Push your changes to your forked repository: `git push origin my-branch`.
-8. Open a pull request from your forked repository to the main Nuggt repository.
+6. Run the pre-commit hook to ensure your code adheres to the project's coding conventions: `pre-commit run --all-files`.
+7. Commit your changes: `git commit -m "Add feature or fix"`.
+8. Push your changes to your forked repository: `git push origin my-branch`.
+9. Open a pull request from your forked repository to the main Nuggt repository.
 
 Please ensure that your code adheres to the project's coding conventions. It's also helpful to include a clear and concise description of your changes in the pull request.
 
