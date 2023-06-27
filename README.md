@@ -1,7 +1,7 @@
 # Nuggt: Automate any task with a single AI command. 
 [![GitHub Repo stars](https://img.shields.io/github/stars/Nuggt-Dev/nuggt?style=social)](https://github.com/Nuggt-Dev/nuggt/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/OfficialNuggt?style=social)](https://twitter.com/OfficialNuggt)
-[![Discord Follow](https://dcbadge.vercel.app/api/server/gzdCDM84?style=flat)](https://discord.gg/gzdCDM84)
+[![Discord Follow](https://dcbadge.vercel.app/api/server/2MF2CDhw?style=flat)](https://discord.gg/2MF2CDhw)
 
 Nuggt is an open-source project that enables users to create AI agents capable of automating any task. Powered by GPT-3.5 and designed for cost-effectiveness, Nuggt offers a step-by-step prompt format for precise task execution. With seamless integration of tools like python, document processing, video analysis, google search, and web browsing, Nuggt empowers users to build controlled autonomous bots efficiently.
 
@@ -9,9 +9,9 @@ While our current implementation leverages the power of GPT-3.5, we recognize th
 
 Join us on this exciting journey of task automation with Nuggt, as we push the boundaries of what can be achieved with smaller open-source large language models, one step at a time 😁.
 
-<h2 align="center"> Demo June 8th 2023 </h2>
+<h2 align="center"> Demo: Creating a snake game </h2>
 
-https://github.com/Nuggt-dev/Nuggt/assets/52075633/00e7c82c-61fe-4f04-b589-d65b97f441ff
+https://github.com/Nuggt-dev/Nuggt/assets/52075633/de6e081e-d263-4092-bf30-4dd857af3527
 
 ## Features
 
@@ -63,5 +63,5 @@ By using this project, you acknowledge and agree to the above disclaimer.
 
 ## Connect with Us
 
-- Join our community at [Discord Server](https://discord.gg/gzdCDM84)
+- Join our community at [Discord Server](https://discord.gg/2MF2CDhw)
 - Follow us on [Twitter](https://twitter.com/OfficialNuggt)
