@@ -1,7 +1,7 @@
 from nuggt import *
 from helper.sidebar_functions import sidebar_logo
 
-sidebar_logo("assets/nuggt-logo.png")
+# sidebar_logo("assets/nuggt-logo.png")
 
 st.subheader("Financial Data Display")
 
