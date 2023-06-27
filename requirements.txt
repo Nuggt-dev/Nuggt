@@ -17,3 +17,4 @@ PyMuPDF>=1.22.3
 python-dotenv>=1.0.0
 colorama>=0.4.6
 bs4>=0.0.1
+toml>=0.10.2

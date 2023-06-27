@@ -13,7 +13,7 @@ import tool
 import openai
 
 load_dotenv()
-config = toml.load("./.streamlit/config.toml")
+config = toml.load("../.streamlit/config.toml")
 
 primary_color = config["theme"]["primaryColor"]
 secondary_background_color = config["theme"]["secondaryBackgroundColor"]
