@@ -32,7 +32,7 @@ load_dotenv()
 #     unsafe_allow_html=True,
 # )
 
-sidebar_logo("assets/nuggt-logo.png")
+# sidebar_logo("assets/nuggt-logo.png")
 
 count = 0
 global tmp_path
