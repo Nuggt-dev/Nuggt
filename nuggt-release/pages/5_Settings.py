@@ -1,4 +1,4 @@
-from nuggt import *
+from Nuggt_Playground import *
 from helper.sidebar_functions import sidebar_logo
 import os
 import streamlit as st
