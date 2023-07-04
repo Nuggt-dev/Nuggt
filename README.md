@@ -1,23 +1,21 @@
-# Nuggt: Automate any task with a single AI command. 
+# Nuggt: An Autonomous LLM Agent that runs on Wizcoder-15B (4-bit Quantised)
 [![GitHub Repo stars](https://img.shields.io/github/stars/Nuggt-Dev/nuggt?style=social)](https://github.com/Nuggt-Dev/nuggt/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/OfficialNuggt?style=social)](https://twitter.com/OfficialNuggt)
 [![Discord Follow](https://dcbadge.vercel.app/api/server/YZp6jmFr?style=flat)](https://discord.gg/YZp6jmFr)
 
 
-Nuggt is an open-source project that enables users to create AI agents capable of automating any task. Powered by GPT-3.5 and designed for cost-effectiveness, Nuggt offers a step-by-step prompt format for precise task execution. With seamless integration of tools like python, document processing, video analysis, google search, and web browsing, Nuggt empowers users to build controlled autonomous bots efficiently.
+This Repo is all about democratising LLM Agents with powerful Open Source LLM Models. Join us on this exciting journey of task automation with Nuggt, as we push the boundaries of what can be achieved with smaller open-source large language models, one step at a time 😁.
 
-While our current implementation leverages the power of GPT-3.5, we recognize the need for cost-effective solutions without compromising functionality. Our ongoing efforts involve exploring and harnessing the potential of smaller models like Vicuna 13B and Orca, ensuring that task automation remains accessible to a wider audience.
+Download Wizcoder-15B 4-bit Quantised from: https://huggingface.co/TheBloke/WizardCoder-15B-1.0-GPTQ (PS: TheBloke is a legend)
 
-Join us on this exciting journey of task automation with Nuggt, as we push the boundaries of what can be achieved with smaller open-source large language models, one step at a time 😁.
+<h2 align="center"> Demo: RandomForest Implementation on Titanic Dataset </h2>
 
-<h2 align="center"> Demo: Creating a snake game </h2>
-
-https://github.com/Nuggt-dev/Nuggt/assets/52075633/de6e081e-d263-4092-bf30-4dd857af3527
+https://github.com/Nuggt-dev/Nuggt/assets/52075633/9cd42404-eb3c-42d5-bb0c-8b4c71623830
 
 ## Features
 
 - 🗃️ All-in-one platform: Create any functionality using a single set of instructions.
-- 🧠 GPT-3.5-turbo: For cheap, accurate, and fast responses powered by prompt engineering.
+- 🧠 Powered by Wizcoder-15B 4-bit Quantised
 - 🔗 Build Controlled Bots: Develop controlled autonomous bots capable of automating tasks efficiently.
 - 🌐 Tool Integration: Enjoy seamless integration with various tools, including Python, document processing, video analysis, Google search, and web browsing.
 - 🚀 Community-Driven: Participate in a vibrant community, contributing feedback, suggestions, and improvements to shape the project's development.
@@ -29,7 +27,9 @@ You can setup the API keys either under `.env` file or set it up under settings 
 ```bash
 git clone https://github.com/Nuggt-dev/Nuggt.git
 pip install -r requirements.txt
-cd nuggt-release
+cd nuggt-wizcoder
+Setup model path in server.py
+python3 server.py
 streamlit run nuggt.py
 ```
 
@@ -42,7 +42,6 @@ streamlit run nuggt.py
 This repository serves as an experimental project and should be considered with the following limitations in mind:
 
 * As of June 9th, 2023, Nuggt is not a fully developed project. We strongly recommend thorough testing before deploying the solution to ensure the security and functionality of your application. 
-* Nuggt still relies on GPT-3.5-turbo for its operations. While this version is more cost-effective than GPT-4, we advise monitoring the expenses to prevent any unexpected financial surprises.
 
 ## Disclaimer
 
