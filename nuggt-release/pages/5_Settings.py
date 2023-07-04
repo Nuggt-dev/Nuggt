@@ -1,9 +1,9 @@
-from nuggt import *
+from Nuggt_Playground import *
 from helper.sidebar_functions import sidebar_logo
 import os
 import streamlit as st
 
-sidebar_logo("assets/nuggt-logo.png")
+# sidebar_logo("assets/nuggt-logo.png")
 
 st.subheader("Settings")
 

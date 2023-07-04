@@ -1,7 +1,7 @@
-from nuggt import *
+from Nuggt_Playground import *
 from helper.sidebar_functions import sidebar_logo
 
-sidebar_logo("assets/nuggt-logo.png")
+# sidebar_logo("assets/nuggt-logo.png")
 
 user_input = """Find websites related to {text:query} using {tool:google}. Browse three results to gather information on {text:query} using {tool:browse_website}. Display the results in the format <Content: Content of the website, URL: URL of the website> using {tool:display}"""
 

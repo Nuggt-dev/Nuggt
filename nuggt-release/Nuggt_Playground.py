@@ -13,26 +13,26 @@ import tool
 import openai
 
 load_dotenv()
-config = toml.load("./.streamlit/config.toml")
+# config = toml.load("../.streamlit/config.toml")
 
-primary_color = config["theme"]["primaryColor"]
-secondary_background_color = config["theme"]["secondaryBackgroundColor"]
-text_color = config["theme"]["textColor"]
+# primary_color = config["theme"]["primaryColor"]
+# secondary_background_color = config["theme"]["secondaryBackgroundColor"]
+# text_color = config["theme"]["textColor"]
+#
+# st.markdown(
+#     f"""
+#     <style>
+#         :root {{
+#             --primary-color: "#e6a634";
+#             --secondary-background-color: "#fbfbfb";
+#             --text-color: "#151c25";
+#         }}
+#     </style>
+#     """,
+#     unsafe_allow_html=True,
+# )
 
-st.markdown(
-    f"""
-    <style>
-        :root {{
-            --primary-color: {primary_color};
-            --secondary-background-color: {secondary_background_color};
-            --text-color: {text_color};
-        }}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-sidebar_logo("assets/nuggt-logo.png")
+# sidebar_logo("assets/nuggt-logo.png")
 
 count = 0
 global tmp_path
