@@ -34,7 +34,8 @@ streamlit run nuggt.py
 ```
 
 ## Documentation
-* [How to use Nuggt](docs/documentation.md)
+* [How to use Nuggt WizardCoder Version](nuggt-wizcoder/guide.md)
+* [How to use Nuggt GPT Version (To be deprecated soon)](docs/documentation.md)
 * [Contribution Guidelines](docs/contribution_guidelines.md)
 
 ## Limitations
