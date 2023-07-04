@@ -72,6 +72,8 @@ These examples cover a variety of tasks and demonstrate how to structure your pr
 
 Prompt: `Print the head of {upload:data} with print() using {tool:python}. Create a bar plot between {text:column1} column and {text:column2} column with matplotlib using {tool:python}. Display the bar plot with proper labels with streamlit library using {tool:python}`
 
+Output format: `I have displayed the visualisations using streamlit`
+
 Description:
 This example creates a barplot comparision for two columns.
 
@@ -79,12 +81,16 @@ This example creates a barplot comparision for two columns.
 
 Prompt: `Get past 7 days OHLC data for stock {text:stock} using {tool:python}. Calculate the MACD and save the MACD table as {text:file} using {tool:python}. Save line plots between MACD and Signal data as {text:image} using {tool:python}.`
 
+Output format: `I have saved the tables and visualisations for the given stock.`
+
 Description:
 This example analyses stock data and saves the MACD data file together with line plot visualisation between MACD and Signal Data.
 
 ### Example 3: Machine Learning
 
 Prompt: `Print a glimpse of {upload:data} using {tool:python}. Preprocess the data to train a machine learning model using {tool:python}. Train a Random Forest model to predict the {text:column} column using {tool:python}. Use GridCV to improve accuracy using {tool:python}. Save the ROC Curve as {text:file} using {tool:python}.`
+
+Output format: `I have trained the machine learning model and saved the ROC Curve.`
 
 Description:
 This example creates a RandomForest model and trains on a given dataset. It then saves the ROC Curver and displays the best parameters (Hyperparameter Tuning with GridCV)
