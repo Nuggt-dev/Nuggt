@@ -17,26 +17,20 @@ This guide will provide you with the necessary information to start using Nuggt 
 1. Clone the Nuggt repository from GitHub: `git clone https://github.com/Nuggt-dev/Nuggt.git`
 2. Install the required dependencies: `pip install -r requirements.txt`
 3. Navigate to the project directory: `cd nuggt-wizcoder`
-4. The tool now supports both local and API inference. The inference mode can be set by using the `SERVER_TYPE` environment variable. For local inference, set `SERVER_TYPE=local` and for API inference, `SERVER_TYPE=api`.
-- For local inference:  
-1. Add the model path to `server.py` (Model used for testing: TheBloke/WizardCoder-15B-1.0-GPTQ)  
-2. Set the environment variable for local inference:
-   ```bash
-   export SERVER_TYPE=local
-   ```
+4. The tool now supports both local and API inference. The inference mode can be set by using the `SERVER_TYPE` environment variable. 
 
-- For API inference:  
-1. Adjust the `booga_api_url` in `server.py` to point to your desired API URL. 
-2. Set the environment variable for API inference:
-   ```bash
-   export SERVER_TYPE=api
-   ```
-
-Run `server.py` using python:
-```bash
-python3 run server.py
-```
-
+ - For local inference:  
+     1. Add the model path to `server.py` (Model used for testing: TheBloke/WizardCoder-15B-1.0-GPTQ)  
+     2. Set the environment variable for local inference:
+        ```bash
+        export SERVER_TYPE=local
+        ```
+ - For API inference:  
+     1. Adjust the `booga_api_url` in `server.py` to point to your desired API URL. 
+     2. Set the environment variable for API inference:
+        ```bash
+        export SERVER_TYPE=api
+        ```
 5. Run server.py using python: `python3 run server.py`
 6. Launch streamlit: `streamlit run nuggt.py`
 
