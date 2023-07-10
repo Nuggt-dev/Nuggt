@@ -108,10 +108,10 @@ class APIInferenceServer(BaseServer):
         request = {
             'prompt': prompt,
             'max_new_tokens': 500,
-            # Feel free to change the parameters below, but from my experiment are the best for code generation
+            # Feel free to change the parameters below, but the following works best for the examples in guide.md
             'do_sample': False,
-            'temperature': 0.2,
-            'top_p': 0.95,
+            'temperature': 0.01,
+            'top_p': 0.01,
             'typical_p': 1,
             'epsilon_cutoff': 0,  # In units of 1e-4
             'eta_cutoff': 0,  # In units of 1e-4
