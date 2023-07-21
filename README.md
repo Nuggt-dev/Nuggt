@@ -1,7 +1,7 @@
 # Nuggt: An Autonomous LLM Agent that runs on Wizcoder-15B (4-bit Quantised)
 [![GitHub Repo stars](https://img.shields.io/github/stars/Nuggt-Dev/nuggt?style=social)](https://github.com/Nuggt-Dev/nuggt/)
 [![Twitter Follow](https://img.shields.io/twitter/follow/OfficialNuggt?style=social)](https://twitter.com/OfficialNuggt)
-[![Discord Follow](https://dcbadge.vercel.app/api/server/H7gMByqf?style=flat)](https://discord.gg/H7gMByqf)
+[![Discord Follow](https://dcbadge.vercel.app/api/server/FuRDdqFA?style=flat)](https://discord.gg/FuRDdqFA)
 
 
 This Repo is all about democratising LLM Agents with powerful Open Source LLM Models. Join us on this exciting journey of task automation with Nuggt, as we push the boundaries of what can be achieved with smaller open-source large language models, one step at a time 😁.
@@ -64,5 +64,5 @@ By using this project, you acknowledge and agree to the above disclaimer.
 
 ## Connect with Us
 
-- Join our community at [Discord Server](https://discord.gg/H7gMByqf)
+- Join our community at [Discord Server](https://discord.gg/FuRDdqFA)
 - Follow us on [Twitter](https://twitter.com/OfficialNuggt)
