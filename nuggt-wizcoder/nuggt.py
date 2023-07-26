@@ -188,7 +188,7 @@ def initialise_agent(nuggt, value_dict, tools):
         regex = r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
         match = re.search(regex, output, re.DOTALL)
 
-        if "Final Step:" in output and not match:
+        if "Final Answer:" in output and not match:
             return output.split("Final Answer:")[1]
             
         
