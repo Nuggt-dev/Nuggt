@@ -1,2 +1,4 @@
 .streamlit/secrets.toml
 nuggt-release/.env
+.idea
+*__pycache__*
